@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ObraPro — Gestão de Obras</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{font-family:Arial;background:#0d1117;color:#fff;margin:0}
+button{cursor:pointer}
+</style>
+</head>
+
+<body>
+
+<h1 style="text-align:center;margin-top:40px">ObraPro funcionando ✅</h1>
+
+<script>
+// CONFIG
+const SUPABASE_URL = '';
+const SUPABASE_KEY = '';
+
+// MOCK DATA
+const DB = {
+  usuarios: [
+    {email:'admin@admin.com',pass:'123'}
+  ]
+};
+
+// LOGIN SIMPLES
+function login(email, pass){
+  return DB.usuarios.find(u=>u.email===email && u.pass===pass);
+}
+
+// TESTE
+console.log("Sistema carregado corretamente!");
+</script>
+
+</body>
+</html>
