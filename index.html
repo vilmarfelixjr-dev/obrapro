@@ -1,0 +1,2319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>ObraPro — Gestão de Obras</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:rgba(255,255,255,0.08);
+      --accent:#f0883e;--accent2:#58a6ff;--green:#3fb950;--red:#f85149;--purple:#d2a8ff;
+      --text:#e6edf3;--muted:#8b949e;--radius:10px;
+    }
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+    h1,h2,h3,h4,h5{font-family:'Syne',sans-serif}
+    .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+    .login-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2.5rem;width:100%;max-width:420px}
+    .login-logo{text-align:center;margin-bottom:2rem}
+    .login-logo h1{font-size:32px;color:var(--accent);letter-spacing:3px}
+    .login-logo p{font-size:12px;color:var(--muted);margin-top:6px}
+    .inp-group{margin-bottom:1rem}
+    .inp-group label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+    .inp-group input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:.2s}
+    .inp-group input:focus{border-color:var(--accent)}
+    .btn{padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;transition:.2s;display:inline-flex;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none}
+    .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#d4762c}
+    .btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)}.btn-ghost:hover{background:rgba(255,255,255,.1)}
+    .btn-green{background:rgba(63,185,80,.15);color:var(--green);border:1px solid rgba(63,185,80,.3)}
+    .btn-red{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.25)}
+    .btn-excel{background:rgba(33,180,96,.15);color:#21b460;border:1px solid rgba(33,180,96,.3);font-weight:600}
+    .btn-excel:hover{background:rgba(33,180,96,.25)}
+    .btn-sm{padding:5px 12px;font-size:12px}
+    .btn-full{width:100%;justify-content:center}
+    .app{display:flex;min-height:100vh}
+    .sidebar{width:230px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+    .sidebar-logo{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border)}
+    .sidebar-logo h2{font-size:20px;color:var(--accent);letter-spacing:1px}
+    .role-badge{font-size:10px;padding:2px 8px;border-radius:12px;margin-top:4px;display:inline-block;font-weight:600}
+    .rb-superadmin{background:rgba(210,168,255,.15);color:var(--purple)}
+    .rb-admin{background:rgba(240,136,62,.15);color:var(--accent)}
+    .rb-user{background:rgba(63,185,80,.15);color:var(--green)}
+    .nav{flex:1;padding:.75rem 0}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 1.5rem;cursor:pointer;color:var(--muted);font-size:13px;transition:.2s;border-left:3px solid transparent;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+    .nav-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
+    .nav-item.active{color:var(--text);background:rgba(240,136,62,.08);border-left-color:var(--accent)}
+    .nav-item svg{width:15px;height:15px;flex-shrink:0}
+    .nav-badge{margin-left:auto;background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700}
+    .nav-section{padding:4px 1.5rem;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:.5rem}
+    .user-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+    .main{flex:1;overflow:auto;min-width:0}
+    .topbar{padding:.9rem 1.75rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);position:sticky;top:0;z-index:10}
+    .topbar h3{font-size:15px}
+    .content{padding:1.75rem}
+    .grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-bottom:1.75rem}
+    .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-bottom:1.75rem}
+    .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;margin-bottom:1.75rem}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+    .metric{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem}
+    .metric-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+    .metric-value{font-size:24px;font-family:'Syne',sans-serif;font-weight:700}
+    .metric-sub{font-size:11px;color:var(--muted);margin-top:3px}
+    .section-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:1rem;font-family:'Syne',sans-serif}
+    .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+    .b-pending{background:rgba(240,136,62,.15);color:var(--accent)}
+    .b-approved{background:rgba(63,185,80,.15);color:var(--green)}
+    .b-rejected{background:rgba(248,81,73,.12);color:var(--red)}
+    .b-active{background:rgba(88,166,255,.12);color:var(--accent2)}
+    table{width:100%;border-collapse:collapse;font-size:13px}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}
+    th{text-align:left;padding:9px 12px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);font-weight:500}
+    td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:rgba(255,255,255,.02)}
+    .progress-bar{background:rgba(255,255,255,.08);border-radius:4px;height:5px}
+    .progress-fill{height:100%;border-radius:4px;transition:.3s}
+    .screen{display:none}.screen.active{display:block}
+    .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;-webkit-overflow-scrolling:touch}
+    .modal-ov.open{display:flex}
+    .modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:2rem;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+    .modal-head h3{font-size:16px}
+    .form-group{margin-bottom:.9rem}
+    .form-group label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+    .form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:.2s}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+    .form-group select option{background:var(--bg)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+    .ai-box{background:rgba(240,136,62,.07);border:1px solid rgba(240,136,62,.2);border-radius:8px;padding:.9rem;margin-top:.5rem}
+    .ai-label{font-size:11px;color:var(--accent);font-weight:600;margin-bottom:.5rem;display:flex;align-items:center;gap:5px}
+    .ai-text{font-size:12px;color:var(--muted);line-height:1.6}
+    .obra-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem;transition:.2s}
+    .obra-card:hover{border-color:rgba(240,136,62,.4)}
+    .obras-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem;margin-bottom:1.5rem}
+    .chat-msgs{display:flex;flex-direction:column;gap:.75rem;max-height:360px;overflow-y:auto;margin-bottom:.75rem}
+    .msg{padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.6;max-width:88%}
+    .msg-user{background:var(--accent);color:#fff;align-self:flex-end;border-radius:10px 10px 2px 10px}
+    .msg-ai{background:var(--bg3);color:var(--text);align-self:flex-start;border-radius:10px 10px 10px 2px}
+    .chat-row{display:flex;gap:8px}
+    .chat-row input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
+    .chat-row input:focus{border-color:var(--accent)}
+    .tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;background:rgba(255,255,255,.06);color:var(--muted)}
+    .client-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem;margin-bottom:.75rem}
+    .empty{text-align:center;padding:3rem;color:var(--muted)}
+    .export-bar{background:rgba(33,180,96,.06);border:1px solid rgba(33,180,96,.15);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+    .export-bar-title{font-size:13px;font-weight:500;color:#21b460;display:flex;align-items:center;gap:8px}
+    .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center}
+    .filter-select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;outline:none;cursor:pointer}
+    .toast{position:fixed;bottom:24px;right:24px;background:#21b460;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;display:none;align-items:center;gap:8px}
+    .toast.show{display:flex}
+    .loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px}
+    .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .perm-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+    .perm-row:last-child{border-bottom:none}
+    .b-compra{background:rgba(88,166,255,.15);color:#58a6ff}
+    .b-conciliado{background:rgba(63,185,80,.2);color:#3fb950;font-weight:700}
+    .upload-area{border:2px dashed var(--border);border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:.2s;margin-bottom:1rem}
+    .upload-area:hover{border-color:var(--accent);background:rgba(240,136,62,.05)}
+    .upload-area.has-file{border-color:var(--green);background:rgba(63,185,80,.05)}
+    .file-preview{display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:.75rem}
+    .file-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+    .oc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem;margin-bottom:.75rem;transition:.2s}
+    .oc-card:hover{border-color:rgba(88,166,255,.3)}
+    .oc-card.conciliado{border-color:rgba(63,185,80,.3);background:rgba(63,185,80,.03)}
+    .oc-card.divergente{border-color:rgba(248,81,73,.3);background:rgba(248,81,73,.03)}
+    .diff-pos{color:var(--green);font-weight:600}
+    .diff-neg{color:var(--red);font-weight:600}
+    .step-bar{display:flex;align-items:center;gap:0;margin-bottom:1.5rem;overflow-x:auto}
+    .step{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px}
+    .step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid var(--border);background:var(--bg3);color:var(--muted);transition:.2s}
+    .step-dot.done{background:var(--green);border-color:var(--green);color:#fff}
+    .step-dot.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .step-line{flex:1;height:2px;background:var(--border);min-width:20px;margin-bottom:16px}
+    .step-line.done{background:var(--green)}
+    .step-label{font-size:10px;color:var(--muted);text-align:center;line-height:1.3}
+    .toggle{width:36px;height:20px;border-radius:10px;position:relative;cursor:default;transition:.2s}
+    .toggle.on{background:var(--green)}.toggle.off{background:var(--bg3);border:1px solid var(--border)}
+    .toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;transition:.2s}
+    .toggle.on::after{left:19px}.toggle.off::after{left:3px}
+    @media(max-width:768px){
+      .app{flex-direction:column}
+      .sidebar{width:100%;height:auto;border-right:none;border-bottom:none;flex-direction:row;flex-shrink:0;order:2;position:fixed;bottom:0;left:0;right:0;z-index:50;background:var(--bg2);border-top:1px solid var(--border);padding:4px 8px;safe-area-inset-bottom:env(safe-area-inset-bottom)}
+      .sidebar-logo{display:none}
+      .nav{display:flex;flex-direction:row;flex:1;gap:0;padding:0;justify-content:space-around;align-items:center}
+      .nav::-webkit-scrollbar{display:none}
+      .nav-item{flex-direction:column;gap:0;padding:6px 8px;font-size:0;min-width:44px;min-height:44px;text-align:center;border-left:none;border-top:none;border-radius:10px;justify-content:center;position:relative}
+      .nav-item span{display:none}
+      .nav-item.active{background:rgba(240,136,62,.12)}
+      .nav-item.active svg{stroke:var(--accent)!important;color:var(--accent)}
+      .nav-item svg{width:22px;height:22px}
+      .nav-badge{position:absolute;top:4px;right:4px;min-width:16px;height:16px;font-size:9px;padding:0 3px;margin:0}
+      .nav-section{display:none}
+      .user-footer{display:none}
+      .main{overflow:auto;padding-bottom:76px;order:1;width:100%}
+      .topbar{padding:.75rem 1rem;flex-wrap:wrap;gap:8px}
+      .topbar h3{font-size:14px}
+      .topbar div{display:flex;flex-wrap:wrap;gap:6px}
+      .content{padding:.75rem}
+      .grid-4{grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:1.25rem}
+      .grid-2{grid-template-columns:1fr;gap:1rem;margin-bottom:1.25rem}
+      .grid-3{grid-template-columns:1fr;gap:.75rem;margin-bottom:1.25rem}
+      .obras-grid{grid-template-columns:1fr}
+      .metric-value{font-size:20px}
+      .btn{padding:10px 14px;font-size:13px;min-height:42px}
+      .btn-sm{padding:8px 12px;font-size:12px;min-height:38px}
+      table{font-size:12px}
+      th{padding:8px 8px;font-size:10px}
+      td{padding:9px 8px}
+      .modal{width:95vw!important;max-height:88vh;margin:0;border-radius:16px 16px 0 0}
+      .modal-ov{align-items:flex-end;padding-bottom:0}
+      .modal-ov.open{align-items:flex-end}
+      .form-row{grid-template-columns:1fr}
+      .filter-row{gap:6px}
+      .export-bar{flex-direction:column;gap:8px}
+      .step-bar{gap:0}
+      .step{min-width:56px}
+      .step-label{font-size:9px}
+      .oc-card{padding:.9rem}
+      .card{padding:.9rem}
+      input,select,textarea{font-size:16px!important;min-height:44px}
+      .upload-area{padding:1.5rem 1rem}
+    }
+    @media(max-width:380px){
+      .nav-item{min-width:38px;padding:5px}
+      .grid-4{grid-template-columns:1fr 1fr}
+      .btn{padding:10px 10px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loading-screen" style="display:none">
+  <div class="spinner"></div>
+  <div style="font-size:13px;color:var(--muted)">Carregando ObraPro...</div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-logo">
+        <h1>OBRAPRO</h1>
+        <p>Sistema de Gestão de Obras</p>
+      </div>
+      <div class="inp-group"><label>Email</label><input id="login-email" type="email" placeholder="seu@email.com"/></div>
+      <div class="inp-group"><label>Senha</label><input id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="btn btn-primary btn-full" onclick="doLogin()">Entrar</button>
+      <div style="margin-top:1rem;padding:.75rem;background:rgba(255,255,255,.04);border-radius:8px;font-size:11px;color:var(--muted);text-align:center">
+        🔒 Conexão segura — dados protegidos por criptografia
+      </div>
+      <div id="login-err" style="color:var(--red);font-size:12px;text-align:center;margin-top:.75rem;display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" style="display:none">
+  <div class="app">
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <h2>OBRAPRO</h2>
+        <span class="role-badge" id="role-badge">—</span>
+      </div>
+      <nav class="nav" id="sidebar-nav"></nav>
+      <div class="user-footer">
+        <div class="avatar" id="user-avatar" style="background:rgba(240,136,62,.2);color:var(--accent)">?</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="user-name">—</div>
+          <div style="font-size:11px;color:var(--muted)" id="user-email-show">—</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="doLogout()" title="Sair">⏻</button>
+      </div>
+    </div>
+    <div class="main">
+
+      <div id="screen-clientes" class="screen">
+        <div class="topbar"><h3>Clientes</h3><button class="btn btn-primary btn-sm" onclick="openModal('modal-cliente')">+ Novo Cliente</button></div>
+        <div class="content">
+          <div class="grid-3">
+            <div class="metric"><div class="metric-label">Total Clientes</div><div class="metric-value" id="mc-total">—</div></div>
+            <div class="metric"><div class="metric-label">Obras Ativas</div><div class="metric-value" id="mc-obras">—</div></div>
+            <div class="metric"><div class="metric-label">Pedidos Pendentes</div><div class="metric-value" id="mc-pend">—</div></div>
+          </div>
+          <div id="clientes-list"></div>
+        </div>
+      </div>
+
+      <div id="screen-usuarios" class="screen">
+        <div class="topbar"><h3>Usuários</h3><button class="btn btn-primary btn-sm" onclick="openModal('modal-usuario')">+ Novo Usuário</button></div>
+        <div class="content">
+          <div class="card">
+            <div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Perfil</th><th>Empresa</th><th>Ações</th></tr></thead>
+            <tbody id="tbl-usuarios"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="screen-dashboard" class="screen">
+        <div class="topbar"><h3>Dashboard</h3>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-excel btn-sm" onclick="exportExcel('obras')">⬇ Excel</button>
+            <button class="btn btn-primary btn-sm" id="btn-nova-obra" onclick="openModal('modal-obra')">+ Nova Obra</button>
+          </div>
+        </div>
+        <div class="content">
+          <div class="grid-4">
+            <div class="metric"><div class="metric-label">Obras Ativas</div><div class="metric-value" id="m-obras">—</div></div>
+            <div class="metric"><div class="metric-label">Total Aprovado</div><div class="metric-value" id="m-aprov">—</div></div>
+            <div class="metric"><div class="metric-label">Pendente</div><div class="metric-value" id="m-pend">—</div><div class="metric-sub" id="m-pend-ct"></div></div>
+            <div class="metric"><div class="metric-label">Alertas ≥80%</div><div class="metric-value" id="m-alert">—</div></div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><div class="section-title">Orçamento por Obra</div><div id="chart-obras"></div></div>
+            <div class="card"><div class="section-title">Últimos Pedidos</div>
+              <table><thead><tr><th>Pedido</th><th>Obra</th><th>Valor</th><th>Status</th></tr></thead>
+              <tbody id="tbl-recentes"></tbody></table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="screen-obras" class="screen">
+        <div class="topbar"><h3>Obras</h3>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-excel btn-sm" onclick="exportExcel('obras')">⬇ Excel</button>
+            <button class="btn btn-primary btn-sm" id="btn-nova-obra2" onclick="openModal('modal-obra')">+ Nova Obra</button>
+          </div>
+        </div>
+        <div class="content"><div class="obras-grid" id="obras-grid"></div></div>
+      </div>
+
+      <div id="screen-pedidos" class="screen">
+        <div class="topbar"><h3>Pedidos de Compra</h3><button class="btn btn-primary btn-sm" onclick="openModal('modal-pedido')">+ Novo Pedido</button></div>
+        <div class="content">
+          <div class="export-bar">
+            <div class="export-bar-title">⬇ Exportar para Excel</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-excel btn-sm" onclick="exportExcel('pedidos-todos')">Todos</button>
+              <button class="btn btn-excel btn-sm" onclick="exportExcel('pedidos-aprovados')">Aprovados</button>
+              <button class="btn btn-excel btn-sm" onclick="exportExcel('pedidos-pendentes')">Pendentes</button>
+              <button class="btn btn-excel btn-sm" onclick="exportExcel('pedidos-obra')">Por Obra</button>
+            </div>
+          </div>
+          <div class="filter-row">
+            <button class="btn btn-ghost btn-sm" id="f-todos" onclick="filterPed('todos',this)" style="border-color:var(--accent);color:var(--accent)">Todos</button>
+            <button class="btn btn-ghost btn-sm" id="f-Pendente" onclick="filterPed('Pendente',this)">Pendentes</button>
+            <button class="btn btn-ghost btn-sm" id="f-Aprovado" onclick="filterPed('Aprovado',this)">Aprovados</button>
+            <button class="btn btn-ghost btn-sm" id="f-Reprovado" onclick="filterPed('Reprovado',this)">Reprovados</button>
+            <select class="filter-select" id="filtro-obra" onchange="renderPedidos()">
+              <option value="">Todas as obras</option>
+            </select>
+            <select class="filter-select" id="filtro-solicitante" onchange="renderPedidos()">
+              <option value="">Todos os solicitantes</option>
+            </select>
+            <input type="date" class="filter-select" id="filtro-data-ini" onchange="renderPedidos()" title="Data inicial" style="width:130px">
+            <input type="date" class="filter-select" id="filtro-data-fim" onchange="renderPedidos()" title="Data final" style="width:130px">
+            <button class="btn btn-ghost btn-sm" onclick="limparFiltrosPed()">✕ Limpar</button>
+          </div>
+          <div class="card">
+            <div class="table-wrap"><table><thead><tr><th>ID</th><th>Obra</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th>Solicitante</th><th>Status</th><th>Aprovador</th><th>Data</th><th>Ações</th></tr></thead>
+            <tbody id="tbl-pedidos"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="screen-aprovacoes" class="screen">
+        <div class="topbar"><h3>Aprovações</h3><button class="btn btn-excel btn-sm" onclick="exportExcel('pedidos-pendentes')">⬇ Excel Pendentes</button></div>
+        <div class="content"><div id="aprov-list"></div></div>
+      </div>
+
+      <!-- COMBUSTIVEL -->
+      <div id="screen-combustivel" class="screen">
+        <div class="topbar">
+          <h3>Controle de Combustível</h3>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-excel btn-sm" onclick="exportExcel('combustivel')">⬇ Excel</button>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('modal-veiculo')">+ Veículo</button>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-abastecimento')">+ Abastecimento</button>
+          </div>
+        </div>
+        <div class="content">
+          <div class="grid-4" id="comb-metrics"></div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="section-title">Frota Cadastrada</div>
+              <div id="frota-list"></div>
+            </div>
+            <div class="card">
+              <div class="section-title">Gasto por Obra</div>
+              <div id="comb-obras"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+              <div class="section-title" style="margin-bottom:0">Histórico de Abastecimentos</div>
+              <select class="filter-select" id="comb-filtro-veiculo" onchange="renderCombustivel()">
+                <option value="">Todos os veículos</option>
+              </select>
+              <select class="filter-select" id="comb-filtro-condutor" onchange="renderCombustivel()">
+                <option value="">Todos os condutores</option>
+              </select>
+              <input type="date" class="filter-select" id="comb-data-ini" onchange="renderCombustivel()" title="Data inicial" style="width:130px">
+              <input type="date" class="filter-select" id="comb-data-fim" onchange="renderCombustivel()" title="Data final" style="width:130px">
+              <button class="btn btn-ghost btn-sm" onclick="limparFiltrosComb()">✕ Limpar</button>
+            </div>
+            <table>
+              <thead><tr><th>Data</th><th>Veículo</th><th>Condutor</th><th>Obra</th><th>KM Rodado</th><th>Litros</th><th>Valor/L</th><th>Total</th><th>KM/L</th><th>Posto</th><th></th></tr></thead>
+              <tbody id="tbl-abast"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="screen-conta" class="screen">
+        <div class="topbar"><h3>Minha Conta</h3></div>
+        <div class="content">
+          <div class="card" style="max-width:480px">
+            <div class="section-title">Dados Pessoais</div>
+            <div class="form-group"><label>Nome</label><input id="conta-nome"/></div>
+            <div class="form-group"><label>Email</label><input id="conta-email" type="email" disabled style="opacity:.5"/></div>
+            <button class="btn btn-primary" onclick="showToast('Funcionalidade disponível na versão com banco de dados!')">Salvar</button>
+          </div>
+          <div class="card" id="perm-card" style="max-width:480px;margin-top:1rem">
+            <div class="section-title">Minhas Permissões</div>
+            <div id="perm-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDENS DE COMPRA -->
+      <div id="screen-ordens" class="screen">
+        <div class="topbar">
+          <h3>Ordens de Compra</h3>
+          <button class="btn btn-excel btn-sm" onclick="exportExcel('ordens')">⬇ Excel</button>
+        </div>
+        <div class="content">
+          <div style="background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);color:var(--accent2);border-radius:8px;padding:.75rem 1rem;margin-bottom:1.25rem;font-size:13px">
+            📋 Pedidos aprovados viram Ordens de Compra. Registre a compra realizada para conciliar.
+          </div>
+          <div class="filter-row">
+            <button class="btn btn-ghost btn-sm" id="of-todos" onclick="filterOC('todos',this)" style="border-color:var(--accent);color:var(--accent)">Todos</button>
+            <button class="btn btn-ghost btn-sm" id="of-Aprovado" onclick="filterOC('Aprovado',this)">Aguardando Compra</button>
+            <button class="btn btn-ghost btn-sm" id="of-reg" onclick="filterOC('Compra Registrada',this)">Registrados</button>
+            <button class="btn btn-ghost btn-sm" id="of-Conciliado" onclick="filterOC('Conciliado',this)">Conciliados</button>
+          </div>
+          <div id="ordens-list"></div>
+        </div>
+      </div>
+
+      <!-- CONCILIAÇÃO -->
+      <div id="screen-conciliacao" class="screen">
+        <div class="topbar">
+          <h3>Conciliação de Compras</h3>
+          <button class="btn btn-excel btn-sm" onclick="exportExcel('conciliacao')">⬇ Excel</button>
+        </div>
+        <div class="content">
+          <div class="grid-4" id="conc-metrics"></div>
+          <div class="grid-2">
+            <div class="card"><div class="section-title">Resumo por Obra</div><div id="conc-obras"></div></div>
+            <div class="card"><div class="section-title">Divergências</div><div id="conc-diverg"></div></div>
+          </div>
+          <div class="card">
+            <div class="section-title">Pedido x Compra Realizada</div>
+            <table>
+              <thead><tr><th>O.C.</th><th>Obra</th><th>Descrição</th><th>Aprovado</th><th>Pago</th><th>Diferença</th><th>Documento</th><th>Status</th></tr></thead>
+              <tbody id="tbl-conciliacao"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAIS -->
+<div class="modal-ov" id="modal-obra">
+  <div class="modal">
+    <div class="modal-head"><h3>Nova Obra</h3><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-obra')">✕</button></div>
+    <div class="form-group"><label>Nome da Obra</label><input id="obra-nome"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>Responsável</label><input id="obra-resp"/></div>
+      <div class="form-group"><label>Orçamento (R$)</label><input id="obra-orc" type="number"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Início</label><input id="obra-ini" type="date"/></div>
+      <div class="form-group"><label>Término Previsto</label><input id="obra-fim" type="date"/></div>
+    </div>
+    <div class="form-group"><label>Endereço</label><input id="obra-end" placeholder="Cidade - UF"/></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn btn-ghost" onclick="closeModal('modal-obra')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarObra()">Cadastrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modal-pedido">
+  <div class="modal">
+    <div class="modal-head"><h3>Novo Pedido de Compra</h3><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-pedido')">✕</button></div>
+    <div class="form-group"><label>Obra</label><select id="ped-obra" onchange="atualizarFasesPedido()"><option value="">Selecione...</option></select></div>
+    <div class="form-group" id="fase-group" style="display:none"><label>Fase / Centro de Custo</label><select id="ped-fase"><option value="">Selecione a fase...</option></select></div>
+    <div class="form-row">
+      <div class="form-group"><label>Categoria</label>
+        <select id="ped-cat"><option>Material</option><option>Mão de Obra</option><option>Equipamento</option><option>Serviço</option><option>Administrativo</option></select>
+      </div>
+      <div class="form-group"><label>Fornecedor</label><input id="ped-forn"/></div>
+    </div>
+    <div class="form-group"><label>Descrição</label><textarea id="ped-desc" rows="2"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Quantidade</label><input id="ped-qtd" type="number" value="1" min="1"/></div>
+      <div class="form-group"><label>Valor Unitário (R$)</label><input id="ped-val" type="number" placeholder="0.00" oninput="updTotal()"/></div>
+    </div>
+    <div id="ped-total-box" style="display:none;background:rgba(63,185,80,.08);border-radius:8px;padding:10px;margin-bottom:.75rem">
+      <span style="font-size:12px;color:var(--muted)">Total: </span>
+      <span id="ped-total" style="font-size:18px;font-weight:700;color:var(--green)"></span>
+    </div>
+    <div id="ai-sug" class="ai-box" style="display:none">
+      <div class="ai-label">⚡ Análise IA</div>
+      <div class="ai-text" id="ai-sug-text"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn btn-ghost" onclick="closeModal('modal-pedido')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPedido()">Criar Pedido</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modal-cliente">
+  <div class="modal">
+    <div class="modal-head"><h3>Novo Cliente</h3><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-cliente')">✕</button></div>
+    <div class="form-group"><label>Nome da Empresa</label><input id="cli-nome"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>CNPJ</label><input id="cli-cnpj" placeholder="00.000.000/0001-00"/></div>
+      <div class="form-group"><label>Cidade</label><input id="cli-cidade"/></div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:.5rem">
+      <div class="section-title">Administrador do Cliente</div>
+      <div class="form-row">
+        <div class="form-group"><label>Nome</label><input id="cli-adm-nome"/></div>
+        <div class="form-group"><label>Email</label><input id="cli-adm-email" type="email"/></div>
+      </div>
+      <div class="form-group"><label>Senha inicial</label><input id="cli-adm-pass" type="password"/></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn btn-ghost" onclick="closeModal('modal-cliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCliente()">Cadastrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modal-usuario">
+  <div class="modal">
+    <div class="modal-head"><h3>Novo Usuário</h3><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-usuario')">✕</button></div>
+    <div class="form-group"><label>Nome Completo</label><input id="usr-nome"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>Email</label><input id="usr-email" type="email"/></div>
+      <div class="form-group"><label>Senha</label><input id="usr-pass" type="password"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Perfil</label><select id="usr-role"><option value="admin">Administrador</option><option value="user">Funcionário</option></select></div>
+      <div class="form-group"><label>Empresa</label><select id="usr-empresa"></select></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn btn-ghost" onclick="closeModal('modal-usuario')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarUsuario()">Criar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modal-export-obra">
+  <div class="modal" style="width:420px">
+    <div class="modal-head"><h3>Exportar por Obra</h3><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-export-obra')">✕</button></div>
+    <div class="form-group"><label>Obra</label><select id="exp-obra-sel" onchange="atualizaPreview()"></select></div>
+    <div class="form-group"><label>Status</label>
+      <select id="exp-status-sel" onchange="atualizaPreview()">
+        <option value="todos">Todos</option><option value="Aprovado">Aprovados</option>
+        <option value="Pendente">Pendentes</option><option value="Reprovado">Reprovados</option>
+      </select>
+    </div>
+    <div id="exp-preview" style="background:var(--bg3);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);margin-bottom:1rem"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-export-obra')">Cancelar</button>
+      <button class="btn btn-excel" onclick="confirmarExportObra()">⬇ Baixar Excel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ <span id="toast-msg"></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ============================================================
+// CONFIGURAÇÃO SUPABASE
+// Substitua pelos seus dados do Supabase após criar o projeto
+// ============================================================
+const SUPABASE_URL = 'https://shpkwrtxwtsnkjpztpxm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_tQIO917CnGIh-aTfHVGJPQ_oStqDnqc';
+
+let sbClient = null;
+
+// Sanitização de inputs para segurança
+function sanitize(str) {
+  if (!str) return '';
+  return String(str).replace(/[<>'"]/g, '').trim();
+}
+
+// Rate limiting simples no login
+let loginAttempts = 0;
+let loginBlockedUntil = 0;
+try {
+  const { createClient } = window.supabase;
+  sbClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  });
+  console.log("Supabase conectado!");
+} catch(e) {
+  console.log("Erro Supabase:", e);
+}
+
+// ============================================================
+// DADOS LOCAIS (demo sem banco de dados)
+// Quando Supabase estiver configurado, os dados vêm do banco
+// ============================================================
+const DB = {
+  clientes: [],
+  usuarios: [],
+  obras: [],
+  veiculos: [],
+  abastecimentos: [],
+  fases: [],
+  pedidos: [],
+};
+
+const PERMS = {
+  superadmin:{label:'Super Admin',color:'rb-superadmin',criarObra:true,aprovar:true,excluir:true,exportar:true,verClientes:true,verDash:true},
+  admin:{label:'Administrador',color:'rb-admin',criarObra:true,aprovar:true,excluir:true,exportar:true,verClientes:false,verDash:true},
+  user:{label:'Funcionário',color:'rb-user',criarObra:false,aprovar:false,excluir:false,exportar:false,verClientes:false,verDash:false}
+};
+
+let session = null;
+let pedFilter = 'todos';
+
+// Login visivel por padrao via HTML
+async function doLogin() {
+  // Rate limiting: bloqueia após 5 tentativas falhas
+  if (Date.now() < loginBlockedUntil) {
+    const restante = Math.ceil((loginBlockedUntil - Date.now()) / 1000);
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('login-err').textContent = `Muitas tentativas. Aguarde ${restante}s.`;
+    return;
+  }
+
+  const email = sanitize(document.getElementById('login-email').value.trim().toLowerCase());
+  const pass = document.getElementById('login-pass').value;
+  const btn = document.querySelector('#login-screen .btn-primary');
+  btn.textContent = 'Entrando...';
+  btn.disabled = true;
+
+  try {
+    if (!sbClient) throw new Error('Sistema offline. Verifique sua conexão.');
+
+    // NIVEL 3: Usar Supabase Auth nativo
+    const { data: authData, error: authError } = await sbClient.auth.signInWithPassword({
+      email: email,
+      password: pass
+    });
+
+    if (authError) {
+      // Fallback: usar função segura com verificação de senha
+      const { data: profileData } = await sbClient
+        .rpc('get_user_profile', { user_email: email });
+      
+      const userData = profileData?.[0];
+      
+
+      session = {
+        id: userData.id,
+        nome: userData.nome,
+        email: userData.email,
+        role: userData.role,
+        empresaId: userData.empresa_id,
+        avatar: userData.nome.slice(0,2).toUpperCase()
+      };
+    } else {
+      // Login via Supabase Auth — forçar sessão no cliente
+      const authUid = authData.user.id;
+
+      // Forçar o token na instância do sbClient
+      await sbClient.auth.setSession({
+        access_token: authData.session.access_token,
+        refresh_token: authData.session.refresh_token
+      });
+
+      // Buscar perfil via função segura
+      const { data: profileData, error: profileErr } = await sbClient
+        .rpc('get_user_profile', { user_email: email });
+
+      if (profileErr) console.log('Erro perfil:', profileErr);
+
+      const userData = profileData?.[0];
+      if (!userData) throw new Error('Perfil não encontrado. Contate o administrador.');
+
+      session = {
+        id: userData.id,
+        authUid: authUid,
+        nome: userData.nome,
+        email: userData.email,
+        role: userData.role,
+        empresaId: userData.empresa_id,
+        avatar: userData.nome.slice(0,2).toUpperCase()
+      };
+    }
+
+    // Garantir que a sessão Auth está ativa antes de carregar dados
+    const { data: { session: activeSession } } = await sbClient.auth.getSession();
+    console.log('Sessão ativa após login:', activeSession?.user?.id);
+    
+    await carregarDados();
+
+    loginAttempts = 0; // Reset tentativas após login bem-sucedido
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    document.getElementById('login-err').style.display = 'none';
+    initApp();
+
+  } catch(e) {
+    loginAttempts++;
+    if (loginAttempts >= 5) {
+      loginBlockedUntil = Date.now() + 30000; // bloqueia 30 segundos
+      loginAttempts = 0;
+      document.getElementById('login-err').textContent = 'Muitas tentativas. Aguarde 30 segundos.';
+    } else {
+      document.getElementById('login-err').textContent = e.message || 'Email ou senha incorretos';
+    }
+    document.getElementById('login-err').style.display = 'block';
+  } finally {
+    btn.textContent = 'Entrar';
+    btn.disabled = false;
+  }
+}
+
+async function carregarDados() {
+  if (!sbClient || !session) return;
+  try {
+    const eId = session.empresaId;
+
+    // Clientes
+    const { data: clientes } = await sbClient.from('clientes').select('*');
+    if (clientes?.length) DB.clientes = clientes.map(c=>({id:c.id,nome:c.nome,cnpj:c.cnpj,cidade:c.cidade}));
+
+    // Obras
+    let qO = sbClient.from('obras').select('*');
+    if (session.role!=='superadmin' && eId) qO = qO.eq('empresa_id',eId);
+    const { data: obras } = await qO;
+    if (obras?.length) DB.obras = obras.map(o=>({id:o.id,nome:o.nome,resp:o.responsavel,orc:parseFloat(o.orcamento)||0,gasto:parseFloat(o.gasto)||0,ini:o.data_inicio,fim:o.data_termino,local:o.local,status:o.status,empresaId:o.empresa_id}));
+
+    // Fases
+    let qF = sbClient.from('fases').select('*').order('ordem');
+    if (session.role!=='superadmin' && eId) qF = qF.eq('empresa_id',eId);
+    const { data: fases } = await qF;
+    if (fases?.length) DB.fases = fases.map(f=>({id:f.id,obraId:f.obra_id,nome:f.nome,orc:parseFloat(f.orcamento)||0,gasto:parseFloat(f.gasto)||0,ordem:f.ordem,empresaId:f.empresa_id}));
+    else DB.fases = [];
+
+    // Pedidos
+    let qP = sbClient.from('pedidos').select('*');
+    if (session.role!=='superadmin' && eId) qP = qP.eq('empresa_id',eId);
+    const { data: pedidos } = await qP;
+    if (pedidos?.length) {
+      DB.pedidos = pedidos.map(p=>({
+        id:p.id, obraId:p.obra_id, faseId:p.fase_id,
+        desc:p.descricao, cat:p.categoria, forn:p.fornecedor,
+        qtd:parseFloat(p.quantidade)||1, val:parseFloat(p.valor_unitario)||0,
+        status:p.status, solicitante:p.solicitante,
+        aprovador:p.aprovador||'', dataAprovacao:p.data_aprovacao||'',
+        data:p.created_at?p.created_at.slice(0,10):'',
+        empresaId:p.empresa_id,
+        // Campos de registro de compra
+        valorPago:p.valor_pago?parseFloat(p.valor_pago):null,
+        dataCompra:p.data_compra||'',
+        formaPagamento:p.forma_pagamento||'',
+        numeroDoc:p.numero_doc||'',
+        obsCompra:p.obs_compra||'',
+        divergencia:p.divergencia?parseFloat(p.divergencia):null,
+        fileNameCompra:p.file_name_compra||''
+      }));
+      // Reconstruir registrosCompra a partir dos pedidos carregados
+      registrosCompra = DB.pedidos
+        .filter(p => p.valorPago !== null)
+        .map(p => ({
+          pedidoId: p.id,
+          valorPago: p.valorPago,
+          data: p.dataCompra,
+          pagto: p.formaPagamento,
+          doc: p.numeroDoc,
+          obs: p.obsCompra,
+          divergencia: p.divergencia,
+          fileName: p.fileNameCompra,
+          fileData: null
+        }));
+    }
+    else DB.pedidos = [];
+
+    // Veiculos
+    let qV = sbClient.from('veiculos').select('*');
+    if (session.role!=='superadmin' && eId) qV = qV.eq('empresa_id',eId);
+    const { data: veiculos } = await qV;
+    if (veiculos?.length) DB.veiculos = veiculos.map(v=>({id:v.id,placa:v.placa,modelo:v.modelo,tipo:v.tipo,kmAtual:parseFloat(v.km_atual)||0,empresaId:v.empresa_id}));
+    else DB.veiculos = [];
+
+    // Abastecimentos
+    let qA = sbClient.from('abastecimentos').select('*').order('created_at');
+    if (session.role!=='superadmin' && eId) qA = qA.eq('empresa_id',eId);
+    const { data: abast } = await qA;
+    if (abast?.length) DB.abastecimentos = abast.map(a=>({id:a.id,veiculoId:a.veiculo_id,obraId:a.obra_id,condutor:a.condutor,data:a.data,kmAnterior:parseFloat(a.km_anterior)||0,kmAtual:parseFloat(a.km_atual)||0,litros:parseFloat(a.litros)||0,valorLitro:parseFloat(a.valor_litro)||0,total:parseFloat(a.total)||0,posto:a.posto,obs:a.obs,fileName:a.file_name,empresaId:a.empresa_id}));
+    else DB.abastecimentos = [];
+
+    // Usuarios (superadmin)
+    if (session.role==='superadmin') {
+      const { data: usuarios } = await sbClient.from('usuarios').select('*');
+      if (usuarios?.length) DB.usuarios = usuarios.map(u=>({id:u.id,nome:u.nome,email:u.email,pass:u.senha,role:u.role,empresaId:u.empresa_id,avatar:u.nome.slice(0,2).toUpperCase()}));
+    }
+
+  } catch(e) { console.log('Erro ao carregar dados:', e); }
+}
+
+async function doLogout() {
+  if (sbClient) await sbClient.auth.signOut();
+  session = null;
+  registrosCompra = [];
+  DB.obras = []; DB.pedidos = []; DB.fases = [];
+  DB.veiculos = []; DB.abastecimentos = [];
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'block';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+function initApp() {
+  const p = PERMS[session.role];
+  document.getElementById('role-badge').textContent = p.label;
+  document.getElementById('role-badge').className = 'role-badge ' + p.color;
+  document.getElementById('user-name').textContent = session.nome;
+  document.getElementById('user-email-show').textContent = session.email;
+  document.getElementById('user-avatar').textContent = session.avatar;
+  buildNav();
+  if (session.role === 'superadmin') goScreen('clientes');
+  else if (session.role === 'user') goScreen('pedidos');
+  else goScreen('dashboard');
+}
+
+function buildNav() {
+  const p = PERMS[session.role];
+  let html = '';
+  if (session.role === 'superadmin') {
+    html += ni('clientes','Clientes','M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z');
+    html += ni('usuarios','Usuários','M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z');
+    html += '<div class="nav-section">Gestão</div>';
+  }
+  // Dashboard e Obras: so para admin e superadmin
+  if (session.role !== 'user') {
+    html += ni('dashboard','Dashboard','M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z');
+  }
+  if (p.criarObra) html += ni('obras','Obras','M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6');
+  html += ni('pedidos','Pedidos','M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2');
+  // Ordens de Compra: visivel para TODOS (funcionario registra compra)
+  html += ni('ordens','Ordens de Compra','M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01');
+  if (p.aprovar) {
+    const pend = getPedidos().filter(x => x.status === 'Pendente').length;
+    html += ni('aprovacoes','Aprovações','M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z','',pend);
+    html += ni('conciliacao','Conciliação','M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z');
+  }
+  html += ni('combustivel','Combustível','M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4');
+  if (session.role !== 'user') html += ni('conta','Minha Conta','M16 7a4 4 0 11-8 0 4 4 0 018 0M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z');
+  document.getElementById('sidebar-nav').innerHTML = html;
+}
+
+function ni(id, label, icon, extra='', badge=0) {
+  return `<div class="nav-item" id="nav-${id}" onclick="goScreen('${id}')">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:15px;height:15px;flex-shrink:0"><path d="${icon}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    ${label}${badge > 0 ? `<span class="nav-badge">${badge}</span>` : ''}
+  </div>`;
+}
+
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const s = document.getElementById('screen-' + id);
+  const n = document.getElementById('nav-' + id);
+  if (s) s.classList.add('active');
+  if (n) n.classList.add('active');
+  const renders = {clientes:renderClientes,usuarios:renderUsuarios,dashboard:renderDash,obras:renderObras,pedidos:()=>renderPedidos(),aprovacoes:renderAprov,ordens:renderOrdens,conciliacao:renderConciliacao,combustivel:renderCombustivel,conta:renderConta};
+  if (renders[id]) renders[id]();
+  const p = PERMS[session.role];
+  ['btn-nova-obra','btn-nova-obra2'].forEach(b => { const el = document.getElementById(b); if(el) el.style.display = p.criarObra ? '' : 'none'; });
+}
+
+function getObras() { return session.role==='superadmin' ? DB.obras : DB.obras.filter(o => o.empresaId === session.empresaId); }
+function getPedidos() { return session.role==='superadmin' ? DB.pedidos : DB.pedidos.filter(p => p.empresaId === session.empresaId); }
+function fmt(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtN(v) { return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function pct(g, o) { return o > 0 ? Math.round(g/o*100) : 0; }
+function badge(s) { const m={Pendente:'b-pending',Aprovado:'b-approved',Reprovado:'b-rejected',Reprovado:'b-rejected',Ativa:'b-active','Compra Registrada':'b-compra','Conciliado':'b-conciliado',Cancelado:'b-rejected'}; return `<span class="badge ${m[s]||''}">${s}</span>`; }
+
+function renderDash() {
+  const peds = getPedidos();
+  const aprov = peds.filter(p=>p.status==='Aprovado').reduce((a,p)=>a+p.qtd*p.val,0);
+  const pend = peds.filter(p=>p.status==='Pendente');
+  document.getElementById('m-obras').textContent = getObras().filter(o=>o.status==='Ativa').length;
+  document.getElementById('m-aprov').textContent = fmt(aprov);
+  document.getElementById('m-pend').textContent = fmt(pend.reduce((a,p)=>a+p.qtd*p.val,0));
+  document.getElementById('m-pend-ct').textContent = pend.length + ' pedidos';
+  document.getElementById('m-alert').textContent = getObras().filter(o=>pct(o.gasto,o.orc)>=80).length;
+  document.getElementById('chart-obras').innerHTML = getObras().map(o => {
+    const fases = getFasesObra(o.id);
+    const gastoTotal = fases.length ? fases.reduce((a,f)=>a+f.gasto,0) : o.gasto;
+    const orcTotal = fases.length ? fases.reduce((a,f)=>a+f.orc,0) : o.orc;
+    const p = pct(gastoTotal,orcTotal); const c = p>=80?'var(--red)':p>=60?'var(--accent)':'var(--green)';
+    const fasesHtml = fases.map(f=>{
+      const fp=pct(f.gasto,f.orc);const fc=fp>=80?'var(--red)':fp>=60?'var(--accent)':'var(--green)';
+      return `<div style="margin:3px 0 3px 12px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px">
+          <span style="color:var(--muted)">${f.nome}</span><span style="color:${fc}">${fp}%</span>
+        </div>
+        <div class="progress-bar" style="height:3px"><div class="progress-fill" style="width:${fp}%;background:${fc}"></div></div>
+      </div>`;
+    }).join('');
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
+        <span style="font-weight:500">${o.nome}</span><span style="color:var(--muted)">${fmt(gastoTotal)} / ${fmt(orcTotal)} (${p}%)</span>
+      </div>
+      <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:${p}%;background:${c}"></div></div>
+      ${fasesHtml}
+    </div>`;
+  }).join('');
+  document.getElementById('tbl-recentes').innerHTML = peds.slice(-5).reverse().map(p => {
+    const o = DB.obras.find(x=>x.id===p.obraId);
+    return `<tr><td style="font-size:11px;color:var(--muted)">${p.id}</td><td>${o?o.nome.split(' ')[0]:'?'}</td><td style="font-weight:500">${fmt(p.qtd*p.val)}</td><td>${badge(p.status)}</td></tr>`;
+  }).join('');
+}
+
+function getFasesObra(obraId) { return (DB.fases||[]).filter(f=>f.obraId===obraId).sort((a,b)=>a.ordem-b.ordem); }
+
+function renderObras() {
+  document.getElementById('obras-grid').innerHTML = getObras().map(o => {
+    // Calcular totais reais a partir das fases
+    const fases = getFasesObra(o.id);
+    const orcTotal = fases.length ? fases.reduce((a,f)=>a+f.orc,0) : o.orc;
+    const gastoTotal = fases.length ? fases.reduce((a,f)=>a+f.gasto,0) : o.gasto;
+    const p = pct(gastoTotal,orcTotal);
+    const c = p>=80?'var(--red)':p>=60?'var(--accent)':'var(--green)';
+    const canDel = PERMS[session.role].excluir;
+    const canEdit = PERMS[session.role].criarObra;
+
+    return `<div class="obra-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:2px">${o.nome}</div>
+          <div style="font-size:11px;color:var(--muted)">${o.resp} · ${o.local}</div>
+        </div>
+        ${badge(o.status)}
+      </div>
+
+      <!-- PROGRESSO TOTAL -->
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px">
+          <span style="color:var(--muted);font-weight:600">TOTAL DA OBRA</span>
+          <span style="color:${c};font-weight:600">${p}%</span>
+        </div>
+        <div class="progress-bar" style="height:7px"><div class="progress-fill" style="width:${p}%;background:${c}"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted)">
+          <span>Gasto: <strong style="color:var(--text)">${fmt(gastoTotal)}</strong></span>
+          <span>Orçado: <strong style="color:var(--text)">${fmt(orcTotal)}</strong></span>
+        </div>
+      </div>
+
+      <!-- FASES -->
+      ${fases.length ? `
+        <div style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:10px">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+            <span>Fases / Centros de Custo</span>
+            ${canEdit ? `<button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:10px" onclick="abrirFases('${o.id}')">+ Gerenciar</button>` : ''}
+          </div>
+          ${fases.map(f => {
+            const fp = pct(f.gasto,f.orc);
+            const fc = fp>=80?'var(--red)':fp>=60?'var(--accent)':'var(--green)';
+            return `<div style="margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+                <span style="color:var(--text)">${f.nome}</span>
+                <span style="color:${fc};font-weight:600">${fp}% · ${fmt(f.gasto)}/${fmt(f.orc)}</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:${fp}%;background:${fc}"></div></div>
+            </div>`;
+          }).join('')}
+        </div>
+      ` : `
+        <div style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:10px">
+          ${canEdit ? `<button class="btn btn-ghost btn-sm" style="width:100%;font-size:12px" onclick="abrirFases('${o.id}')">+ Adicionar Fases / Centros de Custo</button>` : '<div style="font-size:12px;color:var(--muted);text-align:center">Sem fases cadastradas</div>'}
+        </div>
+      `}
+
+      ${canDel ? `<button class="btn btn-red btn-sm" style="width:100%" onclick="delObra('${o.id}')">Excluir Obra</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function delObra(id) { if(!confirm('Excluir esta obra?'))return; if(sbClient) await sbClient.from('obras').delete().eq('id',id); DB.obras=DB.obras.filter(o=>o.id!==id); renderObras(); }
+
+function filterPed(f, el) {
+  pedFilter = f;
+  document.querySelectorAll('[id^="f-"]').forEach(b => {b.style.borderColor='';b.style.color=''});
+  if (el) {el.style.borderColor='var(--accent)';el.style.color='var(--accent)';}
+  renderPedidos();
+}
+
+function renderPedidos() {
+  const sel = document.getElementById('filtro-obra');
+  if (sel && sel.options.length <= 1) {
+    getObras().forEach(o => { const op=document.createElement('option');op.value=o.id;op.textContent=o.nome;sel.appendChild(op); });
+  }
+  // Popular solicitantes
+  const selSolic = document.getElementById('filtro-solicitante');
+  if (selSolic && selSolic.options.length <= 1) {
+    const solics = [...new Set(getPedidos().map(p => p.solicitante).filter(Boolean))].sort();
+    solics.forEach(s => { const op=document.createElement('option');op.value=s;op.textContent=s;selSolic.appendChild(op); });
+  }
+  const obraFiltro = sel?.value || '';
+  const filtroSolic = selSolic?.value || '';
+  const dataIni = document.getElementById('filtro-data-ini')?.value || '';
+  const dataFim = document.getElementById('filtro-data-fim')?.value || '';
+  let list = getPedidos();
+  if (pedFilter !== 'todos') list = list.filter(p => p.status === pedFilter);
+  if (obraFiltro) list = list.filter(p => p.obraId === obraFiltro);
+  if (filtroSolic) list = list.filter(p => p.solicitante === filtroSolic);
+  if (dataIni) list = list.filter(p => p.data >= dataIni);
+  if (dataFim) list = list.filter(p => p.data <= dataFim);
+  document.getElementById('tbl-pedidos').innerHTML = list.length ? list.map(p => {
+    const o = DB.obras.find(x=>x.id===p.obraId);
+    const fase = DB.fases ? DB.fases.find(f=>f.id===p.faseId) : null;
+    const canDel = PERMS[session.role].excluir;
+    const canCancel = canDel && ['Aprovado'].includes(p.status);
+    const canDelete = canDel && p.status === 'Pendente';
+    return `<tr><td style="font-size:11px;color:var(--muted)">${p.id}</td><td>${o?o.nome:'?'}</td><td>${fase?`<span class="tag" style="margin-right:4px">${fase.nome}</span>`:''}${p.desc}</td><td><span class="tag">${p.cat}</span></td><td style="font-weight:500">${fmt(p.qtd*p.val)}</td><td style="font-size:12px;color:var(--muted)">${p.solicitante}</td><td>${badge(p.status)}</td><td style="font-size:12px;color:var(--muted)">${p.aprovador?`<span style="color:var(--green)">${p.aprovador}</span>`:'—'}</td><td style="font-size:11px;color:var(--muted)">${p.data}</td>
+      <td style="white-space:nowrap">
+        ${canDelete ? `<button class="btn btn-red btn-sm" onclick="delPedido('${p.id}')">✕</button>` : ''}
+        ${canCancel ? `<button class="btn btn-ghost btn-sm" style="color:var(--accent);border-color:var(--accent);font-size:11px" onclick="cancelarPedido('${p.id}')">Cancelar</button>` : ''}
+      </td></tr>`;
+  }).join('') : '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Nenhum pedido encontrado</td></tr>';
+}
+
+function renderAprov() {
+  const pend = getPedidos().filter(p=>p.status==='Pendente');
+  const el = document.getElementById('aprov-list');
+  if (!pend.length) { el.innerHTML='<div class="empty">✓ Tudo aprovado!</div>'; return; }
+  el.innerHTML = pend.map(p => {
+    const o = DB.obras.find(x=>x.id===p.obraId);
+    const np = o ? pct(o.gasto+p.qtd*p.val,o.orc) : 0;
+    return `<div style="background:var(--bg2);border:1px solid rgba(240,136,62,.25);border-radius:var(--radius);padding:1.1rem;margin-bottom:.75rem">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div><div style="font-weight:600;font-size:14px;margin-bottom:2px">${p.desc}</div><div style="font-size:11px;color:var(--muted)">${p.id} · ${o?o.nome:'?'} · ${p.solicitante}</div></div>
+        <div style="font-size:18px;font-weight:700;color:var(--accent)">${fmt(p.qtd*p.val)}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <span class="tag">${p.cat}</span><span class="tag">${p.forn}</span><span class="tag">${p.data}</span>
+        ${np>=80?`<span class="badge b-rejected">⚠ Obra em ${np}%</span>`:''}
+      </div>
+      ${p.aprovador ? `<div style="font-size:11px;color:var(--green);margin-bottom:8px">✓ ${p.status} por ${p.aprovador} em ${p.dataAprovacao||''}</div>` : ''}
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-green btn-sm" onclick="aprovar('${p.id}')">✓ Aprovar</button>
+        <button class="btn btn-red btn-sm" onclick="reprovar('${p.id}')">✕ Reprovar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function aprovar(id) {
+  const p=DB.pedidos.find(x=>x.id===id);
+  if(!p) return;
+  p.status='Aprovado';
+  p.aprovador = session.nome;
+  p.dataAprovacao = new Date().toISOString().slice(0,10);
+  const o=DB.obras.find(x=>x.id===p.obraId);
+  if(o) o.gasto+=p.qtd*p.val;
+  if(p.faseId && DB.fases) { const f=DB.fases.find(x=>x.id===p.faseId); if(f) f.gasto+=p.qtd*p.val; if(f && sbClient) await sbClient.from('fases').update({gasto:f.gasto}).eq('id',f.id); }
+  if(sbClient) {
+    await sbClient.from('pedidos').update({status:'Aprovado', aprovador:session.nome, data_aprovacao:p.dataAprovacao}).eq('id',id);
+    if(o) await sbClient.from('obras').update({gasto:o.gasto}).eq('id',o.id);
+  }
+  buildNav();renderAprov();showToast('Pedido aprovado!');
+}
+async function reprovar(id) {
+  const p=DB.pedidos.find(x=>x.id===id);
+  if(!p) return;
+  p.status='Reprovado';
+  p.aprovador = session.nome;
+  p.dataAprovacao = new Date().toISOString().slice(0,10);
+  if(sbClient) await sbClient.from('pedidos').update({status:'Reprovado', aprovador:session.nome, data_aprovacao:p.dataAprovacao}).eq('id',id);
+  buildNav();renderAprov();showToast('Pedido reprovado.');
+}
+
+function renderClientes() {
+  document.getElementById('mc-total').textContent = DB.clientes.length;
+  document.getElementById('mc-obras').textContent = DB.obras.filter(o=>o.status==='Ativa').length;
+  document.getElementById('mc-pend').textContent = DB.pedidos.filter(p=>p.status==='Pendente').length;
+  document.getElementById('clientes-list').innerHTML = DB.clientes.map(c => {
+    const obras = DB.obras.filter(o=>o.empresaId===c.id);
+    const admins = DB.usuarios.filter(u=>u.empresaId===c.id&&u.role==='admin');
+    const users = DB.usuarios.filter(u=>u.empresaId===c.id&&u.role==='user');
+    return `<div class="client-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div><div style="font-weight:600;font-size:15px">${c.nome}</div><div style="font-size:11px;color:var(--muted)">${c.cnpj} · ${c.cidade}</div></div>
+        <div style="display:flex;gap:6px"><span class="badge b-active">${obras.length} obras</span><span class="badge b-approved">${admins.length} admin</span><span class="badge">${users.length} users</span></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-excel btn-sm" onclick="exportExcel('cliente','${c.id}')">⬇ Excel do Cliente</button>
+        <button class="btn btn-red btn-sm" onclick="delCliente('${c.id}')">Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function delCliente(id) {
+  if(!confirm('Excluir cliente e todos os dados?'))return;
+  if(sbClient) await sbClient.from('clientes').delete().eq('id',id);
+  DB.clientes=DB.clientes.filter(c=>c.id!==id);
+  DB.obras=DB.obras.filter(o=>o.empresaId!==id);
+  DB.pedidos=DB.pedidos.filter(p=>p.empresaId!==id);
+  DB.usuarios=DB.usuarios.filter(u=>u.empresaId!==id);
+  renderClientes();
+}
+
+function renderUsuarios() {
+  document.getElementById('tbl-usuarios').innerHTML = DB.usuarios.filter(u=>u.role!=='superadmin').map(u => {
+    const emp = DB.clientes.find(c=>c.id===u.empresaId);
+    const pb = PERMS[u.role];
+    return `<tr><td style="font-weight:500">${u.nome}</td><td style="color:var(--muted)">${u.email}</td><td><span class="role-badge ${pb.color}" style="font-size:11px;padding:2px 8px">${pb.label}</span></td><td>${emp?emp.nome:'—'}</td><td><button class="btn btn-red btn-sm" onclick="delUsuario('${u.id}')">Excluir</button></td></tr>`;
+  }).join('');
+}
+async function delUsuario(id) { if(!confirm('Excluir?'))return; if(sbClient) await sbClient.from('usuarios').delete().eq('id',id); DB.usuarios=DB.usuarios.filter(u=>u.id!==id); renderUsuarios(); }
+
+function renderConta() {
+  document.getElementById('conta-nome').value = session.nome;
+  document.getElementById('conta-email').value = session.email;
+  const permCard = document.getElementById('perm-card');
+  
+  // So superadmin ve as permissoes
+  if (session.role === 'superadmin') {
+    permCard.style.display = 'block';
+    const perms = PERMS[session.role];
+    const items = [['Criar Pedidos',true],['Registrar Compras',true],['Ver Dashboard',perms.verDash],['Aprovar Pedidos',perms.aprovar],['Exportar Excel',perms.exportar],['Criar/Excluir Obras',perms.criarObra],['Ver Todos Clientes',perms.verClientes]];
+    document.getElementById('perm-list').innerHTML = items.map(([l,ok]) => `<div class="perm-row"><span>${l}</span><span class="toggle ${ok?'on':'off'}"></span></div>`).join('');
+  } else {
+    permCard.style.display = 'none';
+  }
+}
+
+async function salvarObra() {
+  const nome = document.getElementById('obra-nome').value.trim();
+  const orc = parseFloat(document.getElementById('obra-orc').value)||0;
+  if(!nome||!orc){alert('Preencha Nome e Orçamento');return;}
+  
+  const eId = session.empresaId || null;
+  const novaObra = {
+    nome, responsavel: document.getElementById('obra-resp').value,
+    orcamento: orc, gasto: 0,
+    data_inicio: document.getElementById('obra-ini').value,
+    data_termino: document.getElementById('obra-fim').value,
+    local: document.getElementById('obra-end').value,
+    status: 'Ativa',
+    empresa_id: eId
+  };
+  
+  if (sbClient) {
+    console.log('DEBUG obra - session.empresaId:', session.empresaId);
+    console.log('DEBUG obra - eId enviado:', eId);
+    console.log('DEBUG obra - auth.uid esperado:', (await sbClient.auth.getUser())?.data?.user?.id);
+    const { data, error } = await sbClient.from('obras').insert([novaObra]).select().single();
+    if (!error && data) {
+      DB.obras.push({id:data.id,nome:data.nome,resp:data.responsavel,orc:parseFloat(data.orcamento),gasto:0,ini:data.data_inicio,fim:data.data_termino,local:data.local,status:data.status,empresaId:data.empresa_id});
+    } else {
+      console.log('Erro salvar obra:', error);
+      const authUser = await sbClient.auth.getUser();
+      alert('Erro ao salvar obra: ' + (error?.message || '') + '\nauth.uid: ' + authUser?.data?.user?.id + '\nempresa_id enviado: ' + eId);
+      return;
+    }
+  } else {
+    const id = 'OB'+String(DB.obras.length+1).padStart(3,'0');
+    DB.obras.push({id,nome,resp:novaObra.responsavel,orc,gasto:0,ini:novaObra.data_inicio,fim:novaObra.data_termino,local:novaObra.local,status:'Ativa',empresaId:eId});
+  }
+  
+  closeModal('modal-obra');renderObras();renderDash();showToast('Obra cadastrada!');
+  document.getElementById('obra-nome').value='';document.getElementById('obra-orc').value='';
+}
+
+async function salvarCliente() {
+  const nome = document.getElementById('cli-nome').value.trim();
+  const email = document.getElementById('cli-adm-email').value.trim();
+  const pass = document.getElementById('cli-adm-pass').value;
+  const admNome = document.getElementById('cli-adm-nome').value.trim();
+  if(!nome||!email||!pass){alert('Preencha os campos obrigatórios');return;}
+  if (sbClient) {
+    const { data: cli, error: eCli } = await sbClient.from('clientes').insert([{nome, cnpj:document.getElementById('cli-cnpj').value, cidade:document.getElementById('cli-cidade').value}]).select().single();
+    if (eCli||!cli) { alert('Erro ao cadastrar cliente: '+(eCli?.message||''));return; }
+    DB.clientes.push({id:cli.id,nome:cli.nome,cnpj:cli.cnpj,cidade:cli.cidade});
+    // 1. Criar no Supabase Auth PRIMEIRO para obter o auth.uid
+    const { data: authData, error: authErr } = await sbClient.auth.signUp({
+      email, password: pass,
+      options: { data: { nome: admNome } }
+    });
+    if (authErr && !authErr.message.includes('already registered')) {
+      console.log('Aviso Auth:', authErr.message);
+    }
+    const authId = authData?.user?.id || null;
+
+    // 2. Criar perfil com id = auth.uid para RLS funcionar
+    const { data: usr, error: eUsr } = await sbClient.from('usuarios')
+      .insert([{id: authId, nome:admNome, email, role:'admin', empresa_id:cli.id}])
+      .select().single();
+    if (!eUsr && usr) {
+      DB.usuarios.push({id:usr.id,nome:usr.nome,email:usr.email,role:usr.role,empresaId:usr.empresa_id,avatar:usr.nome.slice(0,2).toUpperCase()});
+    }
+  } else {
+    const cid='C'+Date.now();
+    DB.clientes.push({id:cid,nome,cnpj:document.getElementById('cli-cnpj').value,cidade:document.getElementById('cli-cidade').value});
+    DB.usuarios.push({id:'U'+Date.now(),nome:admNome,email,pass,role:'admin',empresaId:cid,avatar:admNome.slice(0,2).toUpperCase()});
+  }
+  closeModal('modal-cliente');renderClientes();showToast('Cliente cadastrado!');
+}
+
+async function salvarUsuario() {
+  const nome = sanitize(document.getElementById('usr-nome').value.trim());
+  const email = sanitize(document.getElementById('usr-email').value.trim().toLowerCase());
+  const pass = document.getElementById('usr-pass').value;
+  const role = document.getElementById('usr-role').value;
+  const eId = document.getElementById('usr-empresa').value;
+  if(!nome||!email||!pass){alert('Preencha os campos obrigatórios');return;}
+  if(pass.length < 6){alert('A senha deve ter no mínimo 6 caracteres');return;}
+  if (sbClient) {
+    // 1. Criar no Supabase Auth
+    const { data: authData, error: authErr } = await sbClient.auth.signUp({
+      email, password: pass,
+      options: { data: { nome } }
+    });
+    if (authErr && !authErr.message.includes('already registered')) {
+      alert('Erro ao criar acesso: ' + authErr.message); return;
+    }
+    const authId = authData?.user?.id || null;
+
+    // 2. Criar perfil na tabela usuarios com id = auth.uid
+    const { data, error } = await sbClient.from('usuarios')
+      .insert([{id: authId, nome, email, role, empresa_id: eId}])
+      .select().single();
+    if (error) { alert('Erro: '+(error.message||'')); return; }
+    if (data) DB.usuarios.push({id:data.id,nome:data.nome,email:data.email,pass:data.senha,role:data.role,empresaId:data.empresa_id,avatar:data.nome.slice(0,2).toUpperCase()});
+  } else {
+    DB.usuarios.push({id:'U'+Date.now(),nome,email,pass,role,empresaId:eId,avatar:nome.slice(0,2).toUpperCase()});
+  }
+  closeModal('modal-usuario');renderUsuarios();showToast('Usuário criado!');
+}
+
+function updTotal() {
+  const qtd = parseFloat(document.getElementById('ped-qtd').value)||0;
+  const val = parseFloat(document.getElementById('ped-val').value)||0;
+  const tot = qtd*val;
+  const box = document.getElementById('ped-total-box');
+  if(tot>0){box.style.display='block';document.getElementById('ped-total').textContent=fmt(tot);aiSug(tot,document.getElementById('ped-obra').value);}
+  else box.style.display='none';
+}
+
+function aiSug(valor, obraId) {
+  const o = DB.obras.find(x=>x.id===obraId);
+  if(!o||valor<200)return;
+  const ai = document.getElementById('ai-sug');
+  const txt = document.getElementById('ai-sug-text');
+  ai.style.display='block';
+  const np = pct(o.gasto+valor,o.orc);
+  if(np>=90) txt.innerHTML=`⚠️ Este pedido levará ${o.nome} para ${np}% do orçamento. Risco de estouro!`;
+  else if(np>=80) txt.innerHTML=`🔶 ${o.nome} atingirá ${np}%. Zona de atenção.`;
+  else txt.innerHTML=`✅ OK. ${o.nome}: ${pct(o.gasto,o.orc)}% → ${np}%`;
+}
+
+async function salvarPedido() {
+  const obraId = document.getElementById('ped-obra').value;
+  const desc = document.getElementById('ped-desc').value.trim();
+  const val = parseFloat(document.getElementById('ped-val').value)||0;
+  const qtd = parseFloat(document.getElementById('ped-qtd').value)||1;
+  if(!obraId||!desc||!val){alert('Preencha os campos obrigatórios');return;}
+  const o = DB.obras.find(x=>x.id===obraId);
+  
+  const faseIdSel = document.getElementById('ped-fase')?.value || null;
+  const novoPedido = {
+    obra_id: obraId,
+    fase_id: faseIdSel,
+    descricao: desc,
+    categoria: document.getElementById('ped-cat').value,
+    fornecedor: document.getElementById('ped-forn').value,
+    quantidade: qtd,
+    valor_unitario: val,
+    status: 'Pendente',
+    solicitante: session.nome,
+    empresa_id: o ? o.empresaId : null
+  };
+  
+  if (sbClient) {
+    const { data, error } = await sbClient.from('pedidos').insert([novoPedido]).select().single();
+    if (!error && data) {
+      DB.pedidos.push({id:data.id,obraId:data.obra_id,desc:data.descricao,cat:data.categoria,forn:data.fornecedor,qtd:parseFloat(data.quantidade),val:parseFloat(data.valor_unitario),status:data.status,solicitante:data.solicitante,data:data.created_at?data.created_at.slice(0,10):'',empresaId:data.empresa_id});
+    }
+  } else {
+    const id = 'PED'+String(DB.pedidos.length+1).padStart(3,'0');
+    const faseId = document.getElementById('ped-fase')?.value || null;
+  DB.pedidos.push({id,obraId,faseId,desc,cat:novoPedido.categoria,forn:novoPedido.fornecedor,qtd,val,status:'Pendente',data:new Date().toISOString().slice(0,10),solicitante:session.nome,empresaId:novoPedido.empresa_id});
+  }
+  
+  buildNav();closeModal('modal-pedido');renderPedidos();showToast('Pedido criado!');
+  document.getElementById('ped-desc').value='';document.getElementById('ped-val').value='';
+  document.getElementById('ai-sug').style.display='none';document.getElementById('ped-total-box').style.display='none';
+}
+
+// EXPORTAÇÃO EXCEL
+function exportExcel(tipo, extra) {
+  if(!PERMS[session.role].exportar){showToast('Sem permissão para exportar!');return;}
+  const wb = XLSX.utils.book_new();
+  const now = new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+
+  if(tipo==='pedidos-todos') {
+    const rows=[['ID','Obra','Fase','Descrição','Categoria','Fornecedor','Qtd','Valor Unit (R$)','Total (R$)','Status','Solicitante','Data']];
+    getPedidos().forEach(p=>{
+      const o=DB.obras.find(x=>x.id===p.obraId);
+      const f=DB.fases?DB.fases.find(x=>x.id===p.faseId):null;
+      rows.push([p.id,o?o.nome:'?',f?f.nome:'—',p.desc,p.cat,p.forn,p.qtd,fmtN(p.val),fmtN(p.qtd*p.val),p.status,p.solicitante,p.data]);
+    });
+    const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:8},{wch:25},{wch:25},{wch:30},{wch:14},{wch:20},{wch:6},{wch:14},{wch:14},{wch:12},{wch:20},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,ws,'Pedidos');XLSX.writeFile(wb,`ObraPro_Pedidos_${now}.xlsx`);showToast('Excel baixado!');
+  } else if(tipo==='pedidos-aprovados') {
+    const peds=getPedidos().filter(p=>p.status==='Aprovado');
+    const rows=[['ID','Obra','Fase','Descrição','Categoria','Fornecedor','Qtd','Valor Unit (R$)','Total (R$)','Solicitante','Aprovador','Data Aprovação','Data Pedido']];
+    let tot=0;peds.forEach(p=>{
+      const o=DB.obras.find(x=>x.id===p.obraId);
+      const f=DB.fases?DB.fases.find(x=>x.id===p.faseId):null;
+      tot+=p.qtd*p.val;rows.push([p.id,o?o.nome:'?',f?f.nome:'—',p.desc,p.cat,p.forn,p.qtd,fmtN(p.val),fmtN(p.qtd*p.val),p.solicitante,p.aprovador||'—',p.dataAprovacao||'—',p.data]);
+    });
+    rows.push(['','','','','','','','TOTAL',fmtN(tot),'','','','']);
+    const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:8},{wch:22},{wch:22},{wch:30},{wch:12},{wch:18},{wch:6},{wch:14},{wch:14},{wch:18},{wch:18},{wch:14},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,ws,'Aprovados');XLSX.writeFile(wb,`ObraPro_Aprovados_${now}.xlsx`);showToast('Excel Aprovados baixado!');
+  } else if(tipo==='pedidos-pendentes') {
+    const peds=getPedidos().filter(p=>p.status==='Pendente');
+    const rows=[['ID','Obra','Fase','Descrição','Categoria','Fornecedor','Qtd','Valor Unit (R$)','Total (R$)','Solicitante','Data Pedido']];
+    let tot=0;peds.forEach(p=>{
+      const o=DB.obras.find(x=>x.id===p.obraId);
+      const f=DB.fases?DB.fases.find(x=>x.id===p.faseId):null;
+      tot+=p.qtd*p.val;rows.push([p.id,o?o.nome:'?',f?f.nome:'—',p.desc,p.cat,p.forn,p.qtd,fmtN(p.val),fmtN(p.qtd*p.val),p.solicitante,p.data]);
+    });
+    rows.push(['','','','','','','','TOTAL',fmtN(tot),'','']);
+    const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:8},{wch:22},{wch:22},{wch:30},{wch:12},{wch:18},{wch:6},{wch:14},{wch:14},{wch:18},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,ws,'Pendentes');XLSX.writeFile(wb,`ObraPro_Pendentes_${now}.xlsx`);showToast('Excel Pendentes baixado!');
+  } else if(tipo==='obras') {
+    // Aba 1 - Resumo das Obras
+    const rowsO=[['ID','Nome da Obra','Responsável','Local','Orçamento Total (R$)','Gasto Total (R$)','Saldo (R$)','% Utilizado','Status','Qtd Fases']];
+    getObras().forEach(o=>{
+      const fases=getFasesObra(o.id);
+      const orcTotal=fases.length?fases.reduce((a,f)=>a+f.orc,0):o.orc;
+      const gastoTotal=fases.length?fases.reduce((a,f)=>a+f.gasto,0):o.gasto;
+      rowsO.push([o.id,o.nome,o.resp,o.local,fmtN(orcTotal),fmtN(gastoTotal),fmtN(orcTotal-gastoTotal),pct(gastoTotal,orcTotal)+'%',o.status,fases.length]);
+    });
+    const wsO=XLSX.utils.aoa_to_sheet(rowsO);
+    wsO['!cols']=[{wch:8},{wch:28},{wch:18},{wch:18},{wch:18},{wch:16},{wch:16},{wch:12},{wch:10},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,wsO,'Obras');
+
+    // Aba 2 - Fases por Obra
+    const rowsF=[['Obra','ID Obra','Fase','Ordem','Orçamento (R$)','Gasto (R$)','Saldo (R$)','% Utilizado']];
+    getObras().forEach(o=>{
+      const fases=getFasesObra(o.id);
+      if(fases.length){
+        fases.forEach(f=>{
+          rowsF.push([o.nome,o.id,f.nome,f.ordem,fmtN(f.orc),fmtN(f.gasto),fmtN(f.orc-f.gasto),pct(f.gasto,f.orc)+'%']);
+        });
+        // Linha de total por obra
+        const totOrc=fases.reduce((a,f)=>a+f.orc,0);
+        const totGasto=fases.reduce((a,f)=>a+f.gasto,0);
+        rowsF.push([o.nome+' — TOTAL','','','',fmtN(totOrc),fmtN(totGasto),fmtN(totOrc-totGasto),pct(totGasto,totOrc)+'%']);
+        rowsF.push(['','','','','','','','']); // linha em branco entre obras
+      } else {
+        rowsF.push([o.nome,o.id,'(sem fases cadastradas)','',fmtN(o.orc),fmtN(o.gasto),fmtN(o.orc-o.gasto),pct(o.gasto,o.orc)+'%']);
+      }
+    });
+    const wsF=XLSX.utils.aoa_to_sheet(rowsF);
+    wsF['!cols']=[{wch:28},{wch:8},{wch:30},{wch:8},{wch:16},{wch:16},{wch:16},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,wsF,'Fases por Obra');
+
+    XLSX.writeFile(wb,`ObraPro_Obras_${now}.xlsx`);showToast('Excel Obras + Fases baixado!');
+  } else if(tipo==='pedidos-obra') {
+    const sel=document.getElementById('exp-obra-sel');
+    sel.innerHTML=getObras().map(o=>`<option value="${o.id}">${o.nome}</option>`).join('');
+    atualizaPreview();openModal('modal-export-obra');return;
+  } else if(tipo==='combustivel') {
+    let abast = getAbastecimentos();
+    const fVeic = document.getElementById('comb-filtro-veiculo')?.value;
+    const fCond = document.getElementById('comb-filtro-condutor')?.value;
+    const fCIni = document.getElementById('comb-data-ini')?.value;
+    const fCFim = document.getElementById('comb-data-fim')?.value;
+    if(fVeic) abast = abast.filter(a=>a.veiculoId===fVeic);
+    if(fCond) abast = abast.filter(a=>a.condutor===fCond);
+    if(fCIni) abast = abast.filter(a=>a.data>=fCIni);
+    if(fCFim) abast = abast.filter(a=>a.data<=fCFim);
+    const rows=[['Data','Placa','Modelo','Tipo','Condutor','Obra','KM Anterior','KM Atual','KM Rodado','Litros','Valor/L (R$)','Total (R$)','KM/Litro','Posto','Obs']];
+    abast.forEach(a=>{
+      const v=DB.veiculos.find(x=>x.id===a.veiculoId);
+      const o=DB.obras.find(x=>x.id===a.obraId);
+      const kmRod=a.kmAtual-a.kmAnterior;
+      const kml=a.litros>0&&kmRod>0?(kmRod/a.litros).toFixed(1):'—';
+      rows.push([a.data,v?v.placa:'?',v?v.modelo:'?',v?v.tipo:'?',a.condutor,o?o.nome:'—',a.kmAnterior,a.kmAtual,kmRod,a.litros,fmtN(a.valorLitro),fmtN(a.total),kml,a.posto||'—',a.obs||'']);
+    });
+    const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:12},{wch:10},{wch:22},{wch:12},{wch:20},{wch:22},{wch:12},{wch:12},{wch:12},{wch:8},{wch:12},{wch:14},{wch:10},{wch:20},{wch:20}];
+    XLSX.utils.book_append_sheet(wb,ws,'Abastecimentos');
+
+    // Aba resumo por veiculo
+    const rowsV=[['Placa','Modelo','Tipo','Total Abast.','Total Litros','Total Gasto (R$)','KM Total','KM/Litro Médio']];
+    getVeiculos().forEach(v=>{
+      const va=abast.filter(a=>a.veiculoId===v.id);
+      const tl=va.reduce((a,b)=>a+b.litros,0);
+      const tg=va.reduce((a,b)=>a+b.total,0);
+      const tk=va.reduce((a,b)=>a+(b.kmAtual-b.kmAnterior),0);
+      rowsV.push([v.placa,v.modelo,v.tipo,va.length,tl.toFixed(0),fmtN(tg),tk,tl>0?(tk/tl).toFixed(1):'—']);
+    });
+    const wsV=XLSX.utils.aoa_to_sheet(rowsV);wsV['!cols']=[{wch:12},{wch:22},{wch:12},{wch:14},{wch:14},{wch:16},{wch:12},{wch:16}];
+    XLSX.utils.book_append_sheet(wb,wsV,'Resumo por Veículo');
+
+    XLSX.writeFile(wb,`ObraPro_Combustivel_${now}.xlsx`);showToast('Excel Combustível baixado!');
+  } else if(tipo==='ordens') {
+    const ocs = getPedidos().filter(p => ['Aprovado','Compra Registrada','Conciliado'].includes(p.status));
+    const rows=[['O.C.','Obra','Descrição','Categoria','Fornecedor','Valor Aprovado','Valor Pago','Diferença','Pagamento','Documento','Data Compra','Status']];
+    ocs.forEach(p => {
+      const o=DB.obras.find(x=>x.id===p.obraId);
+      const r=registrosCompra.find(x=>x.pedidoId===p.id);
+      const ocNum='OC-'+p.id.toString().slice(-4).toUpperCase();
+      rows.push([ocNum,o?o.nome:'?',p.desc,p.cat,p.forn,fmtN(p.qtd*p.val),r?fmtN(r.valorPago):'',r?fmtN((p.qtd*p.val)-r.valorPago):'',r?r.pagto:'',r?r.doc:'',r?r.data:'',p.status]);
+    });
+    const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:10},{wch:25},{wch:30},{wch:12},{wch:18},{wch:16},{wch:14},{wch:14},{wch:14},{wch:14},{wch:12},{wch:18}];
+    XLSX.utils.book_append_sheet(wb,ws,'Ordens de Compra');XLSX.writeFile(wb,`ObraPro_OC_${now}.xlsx`);showToast('Excel OC baixado!');
+  } else if(tipo==='conciliacao') {
+    const ocs=getPedidos().filter(p=>['Compra Registrada','Conciliado'].includes(p.status));
+    const rows=[['O.C.','Obra','Descrição','Valor Aprovado','Valor Pago','Diferença','Documento','Pagamento','Data','Status']];
+    let totAprov=0,totPago=0;
+    ocs.forEach(p=>{const o=DB.obras.find(x=>x.id===p.obraId);const r=registrosCompra.find(x=>x.pedidoId===p.id);const ocNum='OC-'+p.id.toString().slice(-4).toUpperCase();const aprov=p.qtd*p.val;const pago=r?r.valorPago:0;totAprov+=aprov;totPago+=pago;rows.push([ocNum,o?o.nome:'?',p.desc,fmtN(aprov),fmtN(pago),fmtN(aprov-pago),r?r.doc:'',r?r.pagto:'',r?r.data:'',p.status]);});
+    rows.push(['','','TOTAL',fmtN(totAprov),fmtN(totPago),fmtN(totAprov-totPago),'','','','']);
+    const ws=XLSX.utils.aoa_to_sheet(rows);XLSX.utils.book_append_sheet(wb,ws,'Conciliação');XLSX.writeFile(wb,`ObraPro_Conciliacao_${now}.xlsx`);showToast('Excel Conciliação baixado!');
+  } else if(tipo==='cliente') {
+    const cid=extra;const cli=DB.clientes.find(c=>c.id===cid);
+    const obras=DB.obras.filter(o=>o.empresaId===cid);const peds=DB.pedidos.filter(p=>p.empresaId===cid);
+    const rowsO=[['ID','Nome','Responsável','Orçamento','Gasto','Saldo','%','Status']];
+    obras.forEach(o=>rowsO.push([o.id,o.nome,o.resp,fmtN(o.orc),fmtN(o.gasto),fmtN(o.orc-o.gasto),pct(o.gasto,o.orc)+'%',o.status]));
+    const wsO=XLSX.utils.aoa_to_sheet(rowsO);XLSX.utils.book_append_sheet(wb,wsO,'Obras');
+    const rowsP=[['ID','Obra','Descrição','Categoria','Fornecedor','Qtd','Valor Unit','Total','Status','Data']];
+    let tot=0;peds.forEach(p=>{const o=obras.find(x=>x.id===p.obraId);tot+=p.qtd*p.val;rowsP.push([p.id,o?o.nome:'?',p.desc,p.cat,p.forn,p.qtd,fmtN(p.val),fmtN(p.qtd*p.val),p.status,p.data])});
+    rowsP.push(['','','','','','','TOTAL',fmtN(tot),'','']);
+    const wsP=XLSX.utils.aoa_to_sheet(rowsP);XLSX.utils.book_append_sheet(wb,wsP,'Pedidos');
+    XLSX.writeFile(wb,`ObraPro_${cli?cli.nome.replace(/\s/g,'_'):'Cliente'}_${now}.xlsx`);showToast('Excel do Cliente baixado!');
+  }
+}
+
+function atualizaPreview() {
+  const obraId=document.getElementById('exp-obra-sel').value;
+  const status=document.getElementById('exp-status-sel').value;
+  let peds=DB.pedidos.filter(p=>p.obraId===obraId);
+  if(status!=='todos')peds=peds.filter(p=>p.status===status);
+  const total=peds.reduce((a,p)=>a+p.qtd*p.val,0);
+  document.getElementById('exp-preview').innerHTML=`${peds.length} pedido(s) · Total: <strong>${fmt(total)}</strong>`;
+}
+
+function confirmarExportObra() {
+  const obraId=document.getElementById('exp-obra-sel').value;
+  const status=document.getElementById('exp-status-sel').value;
+  const obra=DB.obras.find(o=>o.id===obraId);
+  let peds=DB.pedidos.filter(p=>p.obraId===obraId);
+  if(status!=='todos')peds=peds.filter(p=>p.status===status);
+  const wb=XLSX.utils.book_new();
+  const rows=[['ID','Descrição','Categoria','Fornecedor','Qtd','Valor Unit (R$)','Total (R$)','Status','Solicitante','Data']];
+  let tot=0;peds.forEach(p=>{tot+=p.qtd*p.val;rows.push([p.id,p.desc,p.cat,p.forn,p.qtd,fmtN(p.val),fmtN(p.qtd*p.val),p.status,p.solicitante,p.data])});
+  rows.push(['','','','','','TOTAL',fmtN(tot),'','','']);
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  XLSX.utils.book_append_sheet(wb,ws,obra?obra.nome.slice(0,31):'Pedidos');
+  const now=new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+  XLSX.writeFile(wb,`ObraPro_${obra?obra.nome.replace(/\s/g,'_'):'Obra'}_${status}_${now}.xlsx`);
+  closeModal('modal-export-obra');showToast('Excel por Obra baixado!');
+}
+
+
+
+// ============================================================
+// GERENCIAMENTO DE FASES / CENTROS DE CUSTO
+// ============================================================
+
+let currentFaseObraId = null;
+
+function abrirFases(obraId) {
+  currentFaseObraId = obraId;
+  const o = DB.obras.find(x=>x.id===obraId);
+  document.getElementById('fases-modal-title').textContent = `Fases — ${o?o.nome:''}`;
+  renderFasesList();
+  openModal('modal-fases');
+}
+
+function renderFasesList() {
+  const fases = getFasesObra(currentFaseObraId);
+  const el = document.getElementById('fases-list');
+  if (!fases.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:1rem;font-size:13px">Nenhuma fase cadastrada ainda</div>';
+    return;
+  }
+  el.innerHTML = fases.map(f => {
+    const p = pct(f.gasto, f.orc);
+    const c = p>=80?'var(--red)':p>=60?'var(--accent)':'var(--green)';
+    return `<div style="background:var(--bg3);border-radius:8px;padding:.9rem;margin-bottom:.5rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="flex:1">
+          <input value="${f.nome}" onchange="editarFase('${f.id}','nome',this.value)"
+            style="background:transparent;border:none;color:var(--text);font-size:13px;font-weight:600;width:100%;outline:none;border-bottom:1px solid var(--border);padding-bottom:2px"/>
+        </div>
+        <div style="text-align:right;min-width:140px">
+          <div style="font-size:10px;color:var(--muted)">Orçamento</div>
+          <input type="number" value="${f.orc}" onchange="editarFase('${f.id}','orc',parseFloat(this.value)||0)"
+            style="background:transparent;border:none;color:var(--accent);font-size:13px;font-weight:600;width:100px;text-align:right;outline:none"/>
+        </div>
+        <button class="btn btn-red btn-sm" onclick="excluirFase('${f.id}')" style="flex-shrink:0">✕</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+        <span style="color:var(--muted)">Gasto: <strong style="color:var(--text)">${fmt(f.gasto)}</strong></span>
+        <span style="color:${c};font-weight:600">${p}% utilizado</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(p,100)}%;background:${c}"></div></div>
+    </div>`;
+  }).join('');
+
+  // Mostrar total
+  const totalOrc = fases.reduce((a,f)=>a+f.orc,0);
+  const totalGasto = fases.reduce((a,f)=>a+f.gasto,0);
+  el.innerHTML += `<div style="border-top:1px solid var(--border);margin-top:.75rem;padding-top:.75rem;display:flex;justify-content:space-between;font-size:13px;font-weight:600">
+    <span>TOTAL DA OBRA</span>
+    <span>${fmt(totalGasto)} / ${fmt(totalOrc)}</span>
+  </div>`;
+}
+
+async function editarFase(faseId, campo, valor) {
+  const f = DB.fases.find(x=>x.id===faseId);
+  if (!f) return;
+  f[campo] = valor;
+  if (sbClient) {
+    const dbCampo = campo==='orc'?'orcamento':campo==='gasto'?'gasto':'nome';
+    await sbClient.from('fases').update({[dbCampo]:valor}).eq('id',faseId);
+  }
+  renderFasesList();renderObras();
+}
+
+async function excluirFase(faseId) {
+  if (!confirm('Excluir esta fase?')) return;
+  if (sbClient) await sbClient.from('fases').delete().eq('id',faseId);
+  DB.fases = DB.fases.filter(f=>f.id!==faseId);
+  renderFasesList();renderObras();showToast('Fase excluída!');
+}
+
+async function adicionarFase() {
+  const nome = document.getElementById('nova-fase-nome').value.trim();
+  const orc = parseFloat(document.getElementById('nova-fase-orc').value)||0;
+  if (!nome) { alert('Digite o nome da fase'); return; }
+  const fases = getFasesObra(currentFaseObraId);
+  const eId = session.empresaId || DB.obras.find(o=>o.id===currentFaseObraId)?.empresaId || null;
+  const novaFase = {obra_id:currentFaseObraId, nome, orcamento:orc, gasto:0, ordem:fases.length+1, empresa_id:eId};
+  if (!DB.fases) DB.fases = [];
+  if (sbClient) {
+    const { data, error } = await sbClient.from('fases').insert([novaFase]).select().single();
+    if (!error && data) {
+      DB.fases.push({id:data.id,obraId:data.obra_id,nome:data.nome,orc:parseFloat(data.orcamento)||0,gasto:parseFloat(data.gasto)||0,ordem:data.ordem,empresaId:data.empresa_id});
+    } else {
+      console.log('Erro fase:', error);
+      alert('Erro ao salvar fase: ' + (error?.message || 'Verifique o console'));
+      return;
+    }
+  } else {
+    DB.fases.push({id:'F'+Date.now(),obraId:currentFaseObraId,nome,orc,gasto:0,ordem:fases.length+1,empresaId:eId});
+  }
+  document.getElementById('nova-fase-nome').value='';document.getElementById('nova-fase-orc').value='';
+  renderFasesList();renderObras();showToast('Fase adicionada!');
+}
+
+function atualizarFasesPedido() {
+  const obraId = document.getElementById('ped-obra').value;
+  const faseGroup = document.getElementById('fase-group');
+  const faseSelect = document.getElementById('ped-fase');
+  const fases = getFasesObra(obraId);
+  if (fases.length) {
+    faseGroup.style.display = 'block';
+    faseSelect.innerHTML = '<option value="">Selecione a fase...</option>' +
+      fases.map(f => `<option value="${f.id}">${f.nome} — ${fmt(f.orc)}</option>`).join('');
+  } else {
+    faseGroup.style.display = 'none';
+  }
+}
+
+// ============================================================
+// ORDENS DE COMPRA E CONCILIAÇÃO
+// ============================================================
+
+let ocFilter = 'todos';
+let currentOCId = null;
+let uploadedFile = null;
+
+// Registros de compra (em memória + Supabase futuramente)
+let registrosCompra = [];
+
+function filterOC(f, el) {
+  ocFilter = f;
+  document.querySelectorAll('[id^="of-"]').forEach(b=>{b.style.borderColor='';b.style.color=''});
+  if(el){el.style.borderColor='var(--accent)';el.style.color='var(--accent)';}
+  renderOrdens();
+}
+
+function renderOrdens() {
+  const aprovados = getPedidos().filter(p => ['Aprovado','Compra Registrada','Conciliado'].includes(p.status));
+  let list = ocFilter === 'todos' ? aprovados :
+    ocFilter === 'Aprovado' ? aprovados.filter(p => p.status === 'Aprovado') :
+    aprovados.filter(p => p.status === ocFilter);
+
+  const el = document.getElementById('ordens-list');
+  if (!list.length) { el.innerHTML = '<div class="empty">Nenhuma ordem encontrada</div>'; return; }
+
+  el.innerHTML = list.map(p => {
+    const o = DB.obras.find(x => x.id === p.obraId);
+    const reg = registrosCompra.find(r => r.pedidoId === p.id);
+    const ocNum = 'OC-' + p.id.toString().slice(-4).toUpperCase();
+    const steps = ['Pedido','Aprovado','Compra Registrada','Conciliado'];
+    const stepIdx = steps.indexOf(p.status === 'Aprovado' ? 'Aprovado' : p.status);
+
+    return `<div class="oc-card ${p.status === 'Conciliado' ? 'conciliado' : reg && reg.divergencia ? 'divergente' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:2px">${ocNum}</div>
+          <div style="font-weight:600;font-size:14px;margin-bottom:2px">${p.desc}</div>
+          <div style="font-size:11px;color:var(--muted)">${o?o.nome:'?'} · ${p.cat} · ${p.forn}</div>
+        </div>
+        <div style="text-align:right">
+          ${session.role !== 'user' ? `<div style="font-size:18px;font-weight:700">${fmt(p.qtd*p.val)}</div>` : ''}
+          ${badge(p.status)}
+        </div>
+      </div>
+
+      <div class="step-bar">
+        ${steps.map((s,i) => `
+          <div class="step">
+            <div class="step-dot ${i < stepIdx ? 'done' : i === stepIdx ? 'active' : ''}">${i < stepIdx ? '✓' : i+1}</div>
+            <div class="step-label">${s}</div>
+          </div>
+          ${i < steps.length-1 ? `<div class="step-line ${i < stepIdx ? 'done' : ''}"></div>` : ''}
+        `).join('')}
+      </div>
+
+      ${reg ? `
+        <div style="background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+            <div><span style="color:var(--muted)">Valor pago:</span> <strong>${fmt(reg.valorPago)}</strong></div>
+            <div><span style="color:var(--muted)">Pagamento:</span> ${reg.pagto}</div>
+            <div><span style="color:var(--muted)">Doc:</span> ${reg.doc||'—'}</div>
+            <div><span style="color:var(--muted)">Data:</span> ${reg.data}</div>
+          </div>
+          ${reg.fileName ? `<div style="margin-top:8px;display:flex;align-items:center;gap:6px"><span>📎</span><span style="color:var(--accent2)">${reg.fileName}</span></div>` : ''}
+          ${reg.divergencia !== 0 ? `<div style="margin-top:6px">Diferença: <span class="${reg.divergencia > 0 ? 'diff-pos' : 'diff-neg'}">${reg.divergencia > 0 ? '+' : ''}${fmt(reg.divergencia)}</span> ${reg.divergencia > 0 ? '(economia)' : '(estouro)'}</div>` : '<div style="margin-top:6px;color:var(--green)">✓ Valor exato</div>'}
+        </div>
+      ` : ''}
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${p.status === 'Aprovado' ? `<button class="btn btn-primary btn-sm" onclick="abrirRegistroCompra('${p.id}')">📝 Registrar Compra</button>` : ''}
+        ${p.status === 'Compra Registrada' && session.role !== 'user' ? `<button class="btn btn-green btn-sm" onclick="conciliar('${p.id}')">✓ Marcar Conciliado</button>` : ''}
+        ${reg && reg.fileData ? `<button class="btn btn-blue btn-sm" onclick="verDocumento('${p.id}')">📄 Ver Documento</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirRegistroCompra(pedidoId) {
+  currentOCId = pedidoId;
+  const p = DB.pedidos.find(x => x.id === pedidoId);
+  const o = DB.obras.find(x => x.id === p.obraId);
+  const ocNum = 'OC-' + pedidoId.toString().slice(-4).toUpperCase();
+
+  document.getElementById('oc-info-box').innerHTML = `
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div><strong>${ocNum}</strong> — ${p.desc}</div>
+      <div><strong>Valor aprovado: ${fmt(p.qtd*p.val)}</strong></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">${o?o.nome:'?'} · ${p.cat} · ${p.forn}</div>`;
+
+  document.getElementById('rc-data').value = new Date().toISOString().slice(0,10);
+  document.getElementById('rc-valor').value = (p.qtd*p.val).toFixed(2);
+  document.getElementById('rc-doc').value = '';
+  document.getElementById('rc-obs').value = '';
+  document.getElementById('diff-box').style.display = 'none';
+  document.getElementById('file-preview').style.display = 'none';
+  document.getElementById('upload-area').style.display = 'block';
+  document.getElementById('upload-area').classList.remove('has-file');
+  uploadedFile = null;
+
+  calcDiff();
+  openModal('modal-registrar-compra');
+}
+
+function calcDiff() {
+  const p = DB.pedidos.find(x => x.id === currentOCId);
+  if (!p) return;
+  const aprovado = p.qtd * p.val;
+  const pago = parseFloat(document.getElementById('rc-valor').value) || 0;
+  if (!pago) return;
+  const diff = aprovado - pago;
+  const box = document.getElementById('diff-box');
+  box.style.display = 'block';
+  if (diff > 0) {
+    box.style.background = 'rgba(63,185,80,.08)';
+    box.style.border = '1px solid rgba(63,185,80,.2)';
+    box.innerHTML = `✅ Economia de <strong class="diff-pos">${fmt(diff)}</strong> em relação ao valor aprovado`;
+  } else if (diff < 0) {
+    box.style.background = 'rgba(248,81,73,.08)';
+    box.style.border = '1px solid rgba(248,81,73,.2)';
+    box.innerHTML = `⚠️ Estouro de <strong class="diff-neg">${fmt(Math.abs(diff))}</strong> em relação ao valor aprovado`;
+  } else {
+    box.style.background = 'rgba(63,185,80,.08)';
+    box.style.border = '1px solid rgba(63,185,80,.2)';
+    box.innerHTML = `✓ Valor exato — sem divergência`;
+  }
+}
+
+function handleFileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5*1024*1024) { alert('Arquivo muito grande. Máximo 5MB.'); return; }
+
+  uploadedFile = file;
+  document.getElementById('upload-area').style.display = 'none';
+  const preview = document.getElementById('file-preview');
+  preview.style.display = 'flex';
+  document.getElementById('file-name').textContent = file.name;
+  document.getElementById('file-size').textContent = (file.size/1024).toFixed(0) + ' KB';
+}
+
+function removeFile() {
+  uploadedFile = null;
+  document.getElementById('file-preview').style.display = 'none';
+  document.getElementById('upload-area').style.display = 'block';
+  document.getElementById('upload-area').classList.remove('has-file');
+  document.getElementById('rc-file').value = '';
+}
+
+async function salvarRegistroCompra() {
+  const p = DB.pedidos.find(x => x.id === currentOCId);
+  if (!p) return;
+
+  const valorPago = parseFloat(document.getElementById('rc-valor').value) || 0;
+  const data = document.getElementById('rc-data').value;
+  const pagto = document.getElementById('rc-pagto').value;
+  const doc = document.getElementById('rc-doc').value;
+  const obs = document.getElementById('rc-obs').value;
+
+  if (!valorPago || !data) { alert('Preencha data e valor pago'); return; }
+
+  const divergencia = (p.qtd * p.val) - valorPago;
+
+  let fileData = null;
+  let fileName = null;
+
+  // Converter arquivo para base64 para armazenar
+  if (uploadedFile) {
+    fileName = uploadedFile.name;
+    const reader = new FileReader();
+    fileData = await new Promise(resolve => {
+      reader.onload = e => resolve(e.target.result);
+      reader.readAsDataURL(uploadedFile);
+    });
+  }
+
+  // Salvar registro local
+  const registro = { pedidoId: currentOCId, valorPago, data, pagto, doc, obs, divergencia, fileName, fileData, criadoEm: new Date().toISOString() };
+  registrosCompra = registrosCompra.filter(r => r.pedidoId !== currentOCId);
+  registrosCompra.push(registro);
+
+  // Salvar no Supabase
+  p.status = 'Compra Registrada';
+  if (sbClient) {
+    // Atualizar status do pedido
+    const { error: ePed } = await sbClient.from('pedidos').update({
+      status: 'Compra Registrada',
+      valor_pago: valorPago,
+      data_compra: data,
+      forma_pagamento: pagto,
+      numero_doc: doc,
+      obs_compra: obs,
+      divergencia: divergencia,
+      file_name_compra: fileName
+    }).eq('id', currentOCId);
+    if (ePed) console.log('Erro ao salvar compra:', ePed);
+  }
+
+  closeModal('modal-registrar-compra');
+  renderOrdens();
+  showToast('Compra registrada com sucesso!');
+}
+
+async function conciliar(pedidoId) {
+  const p = DB.pedidos.find(x => x.id === pedidoId);
+  if (!p) return;
+  if (!confirm('Marcar esta ordem como Conciliada?')) return;
+  p.status = 'Conciliado';
+  if (sbClient) {
+    const { error } = await sbClient.from('pedidos').update({status:'Conciliado'}).eq('id', pedidoId);
+    if (error) { console.log('Erro conciliar:', error); showToast('Erro ao conciliar. Tente novamente.'); return; }
+  }
+  renderOrdens();
+  showToast('Ordem conciliada!');
+}
+
+function verDocumento(pedidoId) {
+  const reg = registrosCompra.find(r => r.pedidoId === pedidoId);
+  if (!reg || !reg.fileData) return;
+  const win = window.open();
+  if (reg.fileData.startsWith('data:image')) {
+    win.document.write('<img src="'+reg.fileData+'" style="max-width:100%">');
+  } else {
+    win.document.write('<iframe src="'+reg.fileData+'" style="width:100%;height:100vh;border:none"></iframe>');
+  }
+}
+
+function renderConciliacao() {
+  const todos = getPedidos().filter(p => ['Aprovado','Compra Registrada','Conciliado'].includes(p.status));
+  const comRegistro = todos.filter(p => registrosCompra.find(r => r.pedidoId === p.id));
+  const conciliados = todos.filter(p => p.status === 'Conciliado');
+  const divergentes = comRegistro.filter(p => { const r = registrosCompra.find(x => x.pedidoId === p.id); return r && r.divergencia !== 0; });
+  const totalAprovado = todos.reduce((a,p) => a + p.qtd*p.val, 0);
+  const totalPago = comRegistro.reduce((a,p) => { const r = registrosCompra.find(x => x.pedidoId === p.id); return a + (r ? r.valorPago : 0); }, 0);
+  const economia = totalAprovado - totalPago;
+
+  document.getElementById('conc-metrics').innerHTML = `
+    <div class="metric"><div class="metric-label">Total OC's</div><div class="metric-value">${todos.length}</div></div>
+    <div class="metric"><div class="metric-label">Conciliadas</div><div class="metric-value" style="color:var(--green)">${conciliados.length}</div></div>
+    <div class="metric"><div class="metric-label">Com Divergência</div><div class="metric-value" style="color:var(--red)">${divergentes.length}</div></div>
+    <div class="metric"><div class="metric-label">${economia >= 0 ? 'Economia Total' : 'Estouro Total'}</div><div class="metric-value" style="color:${economia >= 0 ? 'var(--green)' : 'var(--red)'}">${fmt(Math.abs(economia))}</div></div>`;
+
+  // Resumo por obra
+  const obraIds = [...new Set(todos.map(p => p.obraId))];
+  document.getElementById('conc-obras').innerHTML = obraIds.map(oid => {
+    const o = DB.obras.find(x => x.id === oid);
+    const oPeds = todos.filter(p => p.obraId === oid);
+    const oConcil = oPeds.filter(p => p.status === 'Conciliado').length;
+    const pct = Math.round(oConcil / oPeds.length * 100);
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span>${o?o.nome:'?'}</span><span style="color:var(--muted)">${oConcil}/${oPeds.length} conciliados</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct===100?'var(--green)':'var(--accent)'}"></div></div>
+    </div>`;
+  }).join('') || '<div style="color:var(--muted);font-size:13px">Nenhuma OC ainda</div>';
+
+  // Divergências
+  document.getElementById('conc-diverg').innerHTML = divergentes.length ?
+    divergentes.map(p => {
+      const r = registrosCompra.find(x => x.pedidoId === p.id);
+      const o = DB.obras.find(x => x.id === p.obraId);
+      return `<div style="padding:10px;background:var(--bg3);border-radius:8px;margin-bottom:8px;font-size:12px">
+        <div style="font-weight:500;margin-bottom:4px">${p.desc}</div>
+        <div style="color:var(--muted)">${o?o.nome:'?'}</div>
+        <div>Aprovado: ${fmt(p.qtd*p.val)} → Pago: ${fmt(r.valorPago)} 
+          <span class="${r.divergencia > 0 ? 'diff-pos' : 'diff-neg'}">(${r.divergencia > 0 ? '+' : ''}${fmt(r.divergencia)})</span>
+        </div>
+      </div>`;
+    }).join('') : '<div style="color:var(--green);font-size:13px;padding:1rem;text-align:center">✓ Sem divergências!</div>';
+
+  // Tabela detalhada
+  document.getElementById('tbl-conciliacao').innerHTML = todos.map(p => {
+    const o = DB.obras.find(x => x.id === p.obraId);
+    const r = registrosCompra.find(x => x.pedidoId === p.id);
+    const ocNum = 'OC-' + p.id.toString().slice(-4).toUpperCase();
+    const diff = r ? (p.qtd*p.val) - r.valorPago : null;
+    return `<tr>
+      <td style="font-size:11px;color:var(--muted)">${ocNum}</td>
+      <td>${o?o.nome:'?'}</td>
+      <td>${p.desc}</td>
+      <td style="font-weight:500">${fmt(p.qtd*p.val)}</td>
+      <td style="font-weight:500">${r ? fmt(r.valorPago) : '—'}</td>
+      <td>${diff !== null ? `<span class="${diff > 0 ? 'diff-pos' : diff < 0 ? 'diff-neg' : ''}">${diff > 0 ? '+' : ''}${fmt(diff)}</span>` : '—'}</td>
+      <td>${r && r.fileName ? `<span style="color:var(--accent2);font-size:11px">📎 ${r.fileName}</span>` : '—'}</td>
+      <td>${badge(p.status)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Export para ordens e conciliação
+const _exportExcelOrig = exportExcel;
+
+
+// ============================================================
+// MÓDULO DE COMBUSTÍVEL
+// ============================================================
+
+let abUploadedFile = null;
+
+function getVeiculos() {
+  return session.role==='superadmin' ? DB.veiculos : (DB.veiculos||[]).filter(v=>v.empresaId===session.empresaId);
+}
+function getAbastecimentos() {
+  return session.role==='superadmin' ? DB.abastecimentos : (DB.abastecimentos||[]).filter(a=>a.empresaId===session.empresaId);
+}
+
+function limparFiltrosPed() {
+  document.getElementById('filtro-obra').value='';
+  const ss=document.getElementById('filtro-solicitante');if(ss)ss.value='';
+  document.getElementById('filtro-data-ini').value='';
+  document.getElementById('filtro-data-fim').value='';
+  pedFilter='';
+  document.querySelectorAll('[id^="f-"]').forEach(b=>{b.style.borderColor='';b.style.color='';});
+  renderPedidos();
+}
+
+function limparFiltrosComb() {
+  document.getElementById('comb-filtro-veiculo').value='';
+  document.getElementById('comb-filtro-condutor').value='';
+  document.getElementById('comb-data-ini').value='';
+  document.getElementById('comb-data-fim').value='';
+  renderCombustivel();
+}
+
+function renderCombustivel() {
+  const abast = getAbastecimentos();
+  const veics = getVeiculos();
+
+  // Atualizar filtro de veiculos
+  const sel = document.getElementById('comb-filtro-veiculo');
+  if (sel && sel.options.length <= 1) {
+    veics.forEach(v => { const op=document.createElement('option');op.value=v.id;op.textContent=v.placa+' — '+v.modelo;sel.appendChild(op); });
+  }
+  const filtroVeic = sel?.value || '';
+  const filtroCond = document.getElementById('comb-filtro-condutor')?.value || '';
+  const combIni = document.getElementById('comb-data-ini')?.value || '';
+  const combFim = document.getElementById('comb-data-fim')?.value || '';
+
+  let lista = abast;
+  if(filtroVeic) lista = lista.filter(a=>a.veiculoId===filtroVeic);
+  if(filtroCond) lista = lista.filter(a=>a.condutor===filtroCond);
+  if(combIni) lista = lista.filter(a=>a.data>=combIni);
+  if(combFim) lista = lista.filter(a=>a.data<=combFim);
+
+  // Popular select condutores
+  const selCond = document.getElementById('comb-filtro-condutor');
+  if(selCond && selCond.options.length <= 1) {
+    const conds = [...new Set(abast.map(a=>a.condutor).filter(Boolean))].sort();
+    conds.forEach(c => { const o=document.createElement('option');o.value=c;o.textContent=c;selCond.appendChild(o); });
+  }
+
+  // Métricas
+  const totalGasto = lista.reduce((a,b)=>a+b.total,0);
+  const totalLitros = lista.reduce((a,b)=>a+b.litros,0);
+  const totalKm = lista.reduce((a,b)=>a+(b.kmAtual-b.kmAnterior),0);
+  const mediaKml = totalLitros > 0 ? (totalKm/totalLitros).toFixed(1) : '—';
+
+  document.getElementById('comb-metrics').innerHTML = `
+    <div class="metric"><div class="metric-label">Total Gasto</div><div class="metric-value">${fmt(totalGasto)}</div></div>
+    <div class="metric"><div class="metric-label">Total Litros</div><div class="metric-value">${totalLitros.toFixed(0)}L</div></div>
+    <div class="metric"><div class="metric-label">KM Total Rodado</div><div class="metric-value">${totalKm.toLocaleString('pt-BR')} km</div></div>
+    <div class="metric"><div class="metric-label">Média KM/Litro</div><div class="metric-value">${mediaKml}</div></div>`;
+
+  // Frota
+  const frotaEl = document.getElementById('frota-list');
+  frotaEl.innerHTML = veics.length ? veics.map(v => {
+    const vAbast = abast.filter(a=>a.veiculoId===v.id);
+    const vGasto = vAbast.reduce((a,b)=>a+b.total,0);
+    const vLitros = vAbast.reduce((a,b)=>a+b.litros,0);
+    const vKm = vAbast.reduce((a,b)=>a+(b.kmAtual-b.kmAnterior),0);
+    const vKml = vLitros > 0 ? (vKm/vLitros).toFixed(1) : '—';
+    const canDelV = PERMS[session.role].excluir;
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-weight:600;font-size:14px">${v.placa} <span style="font-size:11px;font-weight:400;color:var(--muted)">— ${v.modelo}</span></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${v.tipo} · ${vAbast.length} abastecimentos · KM atual: ${v.kmAtual.toLocaleString('pt-BR')}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="text-align:right;font-size:12px">
+          <div style="font-weight:600">${fmt(vGasto)}</div>
+          <div style="color:var(--accent2)">${vKml} km/L</div>
+        </div>
+        ${canDelV ? `<button class="btn btn-red btn-sm" onclick="delVeiculo('${v.id}')">✕</button>` : ''}
+      </div>
+    </div>`;
+  }).join('') : '<div style="color:var(--muted);font-size:13px;padding:1rem 0;text-align:center">Nenhum veículo cadastrado</div>';
+
+  // Gasto por obra
+  const obraIds = [...new Set(lista.map(a=>a.obraId).filter(Boolean))];
+  document.getElementById('comb-obras').innerHTML = obraIds.length ? obraIds.map(oid => {
+    const o = DB.obras.find(x=>x.id===oid);
+    const oGasto = lista.filter(a=>a.obraId===oid).reduce((a,b)=>a+b.total,0);
+    return `<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;font-size:13px">
+      <span>${o?o.nome:'Sem obra'}</span><span style="font-weight:600">${fmt(oGasto)}</span>
+    </div>`;
+  }).join('') : '<div style="color:var(--muted);font-size:13px;padding:1rem 0;text-align:center">Nenhum abastecimento ainda</div>';
+
+  // Tabela histórico
+  const tbody = document.getElementById('tbl-abast');
+  tbody.innerHTML = lista.length ? [...lista].reverse().map(a => {
+    const v = DB.veiculos.find(x=>x.id===a.veiculoId);
+    const o = DB.obras.find(x=>x.id===a.obraId);
+    const kmRod = a.kmAtual - a.kmAnterior;
+    const kml = a.litros > 0 ? (kmRod/a.litros).toFixed(1) : '—';
+    const kmlColor = parseFloat(kml) < 4 ? 'var(--red)' : parseFloat(kml) < 6 ? 'var(--accent)' : 'var(--green)';
+    const canDelAbast = PERMS[session.role].excluir;
+    return `<tr>
+      <td style="font-size:12px">${a.data}</td>
+      <td><strong>${v?v.placa:'?'}</strong><div style="font-size:10px;color:var(--muted)">${v?v.modelo:''}</div></td>
+      <td style="font-size:12px">${a.condutor}</td>
+      <td style="font-size:12px">${o?o.nome:'—'}</td>
+      <td style="font-size:12px">${kmRod.toLocaleString('pt-BR')} km</td>
+      <td style="font-size:12px">${a.litros}L</td>
+      <td style="font-size:12px">${fmt(a.valorLitro)}</td>
+      <td style="font-weight:600">${fmt(a.total)}</td>
+      <td style="font-weight:600;color:${kmlColor}">${kml}</td>
+      <td style="font-size:11px;color:var(--muted)">${a.posto||'—'}</td>
+      <td>${canDelAbast ? `<button class="btn btn-red btn-sm" onclick="delAbastecimento('${a.id}')">✕</button>` : ''}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--muted)">Nenhum abastecimento registrado</td></tr>';
+}
+
+function atualizarKmVeiculo() {
+  const vid = document.getElementById('ab-veiculo').value;
+  const v = DB.veiculos.find(x=>x.id===vid);
+  if (v) {
+    document.getElementById('ab-km-ant').value = v.kmAtual;
+    document.getElementById('ab-km-atual').value = '';
+  }
+}
+
+function calcAbast() {
+  const kmAnt = parseFloat(document.getElementById('ab-km-ant').value)||0;
+  const kmAt = parseFloat(document.getElementById('ab-km-atual').value)||0;
+  const litros = parseFloat(document.getElementById('ab-litros').value)||0;
+  const vl = parseFloat(document.getElementById('ab-vl').value)||0;
+  const box = document.getElementById('ab-calc-box');
+  if (litros > 0 && vl > 0) {
+    const total = litros * vl;
+    const kmRod = kmAt - kmAnt;
+    const kml = litros > 0 && kmRod > 0 ? (kmRod/litros).toFixed(1) : '—';
+    box.style.display = 'block';
+    document.getElementById('ab-total').textContent = fmt(total);
+    document.getElementById('ab-km-rod').textContent = kmRod > 0 ? kmRod.toLocaleString('pt-BR')+' km' : '—';
+    document.getElementById('ab-kml').textContent = kml+' km/L';
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+function handleAbFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5*1024*1024) { alert('Arquivo muito grande. Máximo 5MB.'); return; }
+  abUploadedFile = file;
+  document.getElementById('ab-upload-area').style.display = 'none';
+  document.getElementById('ab-file-preview').style.display = 'flex';
+  document.getElementById('ab-file-name').textContent = file.name;
+  document.getElementById('ab-file-size').textContent = (file.size/1024).toFixed(0)+' KB';
+}
+
+function removeAbFile() {
+  abUploadedFile = null;
+  document.getElementById('ab-file-preview').style.display = 'none';
+  document.getElementById('ab-upload-area').style.display = 'block';
+  document.getElementById('ab-file').value = '';
+}
+
+async function salvarVeiculo() {
+  const placa = document.getElementById('v-placa').value.trim().toUpperCase();
+  const modelo = document.getElementById('v-modelo').value.trim();
+  if (!placa||!modelo) { alert('Preencha placa e modelo'); return; }
+  const eId = session.empresaId||DB.clientes[0]?.id;
+  const novoV = {placa, modelo, tipo:document.getElementById('v-tipo').value, km_atual:parseFloat(document.getElementById('v-km').value)||0, empresa_id:eId};
+  if (!DB.veiculos) DB.veiculos = [];
+  if (sbClient) {
+    const { data, error } = await sbClient.from('veiculos').insert([novoV]).select().single();
+    if (!error && data) DB.veiculos.push({id:data.id,placa:data.placa,modelo:data.modelo,tipo:data.tipo,kmAtual:parseFloat(data.km_atual)||0,empresaId:data.empresa_id});
+    else { console.log('Erro veiculo:', error); return; }
+  } else {
+    DB.veiculos.push({id:'V'+Date.now(),placa,modelo,tipo:novoV.tipo,kmAtual:novoV.km_atual,empresaId:eId});
+  }
+  closeModal('modal-veiculo');
+  document.getElementById('v-placa').value='';document.getElementById('v-modelo').value='';document.getElementById('v-km').value='';
+  renderCombustivel();showToast('Veículo cadastrado!');
+}
+
+async function salvarAbastecimento() {
+  const vid = document.getElementById('ab-veiculo').value;
+  const condutor = document.getElementById('ab-condutor').value.trim();
+  const litros = parseFloat(document.getElementById('ab-litros').value)||0;
+  const vl = parseFloat(document.getElementById('ab-vl').value)||0;
+  const kmAt = parseFloat(document.getElementById('ab-km-atual').value)||0;
+  if (!vid||!condutor||!litros||!vl||!kmAt) { alert('Preencha todos os campos obrigatórios'); return; }
+
+  const v = DB.veiculos.find(x=>x.id===vid);
+  const kmAnt = v ? v.kmAtual : 0;
+  const total = litros * vl;
+  const id = 'AB'+Date.now();
+
+  let fileName=null, fileData=null;
+  if (abUploadedFile) {
+    fileName = abUploadedFile.name;
+    const reader = new FileReader();
+    fileData = await new Promise(res => { reader.onload=e=>res(e.target.result); reader.readAsDataURL(abUploadedFile); });
+  }
+
+  if (!DB.abastecimentos) DB.abastecimentos = [];
+  DB.abastecimentos.push({id, veiculoId:vid, obraId:document.getElementById('ab-obra').value, condutor, data:document.getElementById('ab-data').value, kmAnterior:kmAnt, kmAtual:kmAt, litros, valorLitro:vl, total, posto:document.getElementById('ab-posto').value, obs:document.getElementById('ab-obs').value, fileName, fileData, empresaId:session.empresaId||DB.clientes[0]?.id});
+
+  // Atualizar km do veiculo
+  if (v) v.kmAtual = kmAt;
+
+  const eId = session.empresaId||DB.clientes[0]?.id;
+  const novoAb = {veiculo_id:vid, obra_id:document.getElementById('ab-obra').value||null, condutor, data:document.getElementById('ab-data').value, km_anterior:kmAnt, km_atual:kmAt, litros, valor_litro:vl, total, posto:document.getElementById('ab-posto').value, obs:document.getElementById('ab-obs').value, file_name:fileName, empresa_id:eId};
+  if (!DB.abastecimentos) DB.abastecimentos = [];
+  if (sbClient) {
+    const { data, error } = await sbClient.from('abastecimentos').insert([novoAb]).select().single();
+    if (!error && data) {
+      DB.abastecimentos.push({id:data.id,veiculoId:data.veiculo_id,obraId:data.obra_id,condutor:data.condutor,data:data.data,kmAnterior:parseFloat(data.km_anterior)||0,kmAtual:parseFloat(data.km_atual)||0,litros:parseFloat(data.litros)||0,valorLitro:parseFloat(data.valor_litro)||0,total:parseFloat(data.total)||0,posto:data.posto,obs:data.obs,fileName:data.file_name,fileData,empresaId:data.empresa_id});
+      if (v && sbClient) await sbClient.from('veiculos').update({km_atual:kmAt}).eq('id',vid);
+    } else { console.log('Erro abastecimento:', error); return; }
+  } else {
+    DB.abastecimentos.push({id:'AB'+Date.now(),veiculoId:vid,obraId:novoAb.obra_id,condutor,data:novoAb.data,kmAnterior:kmAnt,kmAtual:kmAt,litros,valorLitro:vl,total,posto:novoAb.posto,obs:novoAb.obs,fileName,fileData,empresaId:eId});
+    if (v) v.kmAtual = kmAt;
+  }
+  closeModal('modal-abastecimento');
+  abUploadedFile=null;
+  document.getElementById('ab-file-preview').style.display='none';
+  document.getElementById('ab-upload-area').style.display='block';
+  document.getElementById('ab-litros').value='';document.getElementById('ab-vl').value='';document.getElementById('ab-km-atual').value='';
+  renderCombustivel();showToast('Abastecimento registrado!');
+}
+
+
+// ============================================================
+// FUNÇÕES DE EXCLUSÃO E CANCELAMENTO
+// ============================================================
+
+async function delPedido(id) {
+  if (!confirm('Excluir este pedido? Esta ação não pode ser desfeita.')) return;
+  const p = DB.pedidos.find(x => x.id === id);
+  if (!p || p.status !== 'Pendente') { alert('Só é possível excluir pedidos Pendentes.'); return; }
+  if (sbClient) {
+    const { error } = await sbClient.from('pedidos').delete().eq('id', id);
+    if (error) { showToast('Erro ao excluir pedido.'); return; }
+  }
+  DB.pedidos = DB.pedidos.filter(x => x.id !== id);
+  buildNav(); renderPedidos(); showToast('Pedido excluído!');
+}
+
+async function cancelarPedido(id) {
+  if (!confirm('Cancelar este pedido? O valor será devolvido ao orçamento da obra.')) return;
+  const p = DB.pedidos.find(x => x.id === id);
+  if (!p) return;
+  // Reverter gasto da obra
+  const o = DB.obras.find(x => x.id === p.obraId);
+  if (o) o.gasto = Math.max(0, o.gasto - p.qtd * p.val);
+  // Reverter gasto da fase
+  if (p.faseId && DB.fases) {
+    const f = DB.fases.find(x => x.id === p.faseId);
+    if (f) f.gasto = Math.max(0, f.gasto - p.qtd * p.val);
+    if (f && sbClient) await sbClient.from('fases').update({gasto: f.gasto}).eq('id', f.id);
+  }
+  p.status = 'Cancelado';
+  if (sbClient) {
+    await sbClient.from('pedidos').update({status: 'Cancelado'}).eq('id', id);
+    if (o) await sbClient.from('obras').update({gasto: o.gasto}).eq('id', o.id);
+  }
+  buildNav(); renderPedidos(); renderDash(); showToast('Pedido cancelado. Valor devolvido ao orçamento.');
+}
+
+async function delVeiculo(id) {
+  const abasts = (DB.abastecimentos||[]).filter(a => a.veiculoId === id);
+  if (abasts.length > 0) {
+    if (!confirm(`Este veículo tem ${abasts.length} abastecimento(s) registrado(s). Excluir tudo?`)) return;
+    if (sbClient) await sbClient.from('abastecimentos').delete().eq('veiculo_id', id);
+    DB.abastecimentos = DB.abastecimentos.filter(a => a.veiculoId !== id);
+  } else {
+    if (!confirm('Excluir este veículo?')) return;
+  }
+  if (sbClient) await sbClient.from('veiculos').delete().eq('id', id);
+  DB.veiculos = DB.veiculos.filter(v => v.id !== id);
+  renderCombustivel(); showToast('Veículo excluído!');
+}
+
+async function delAbastecimento(id) {
+  if (!confirm('Excluir este abastecimento?')) return;
+  if (sbClient) await sbClient.from('abastecimentos').delete().eq('id', id);
+  DB.abastecimentos = DB.abastecimentos.filter(a => a.id !== id);
+  renderCombustivel(); showToast('Abastecimento excluído!');
+}
+
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='modal-pedido'){
+    const sel=document.getElementById('ped-obra');
+    sel.innerHTML='<option value="">Selecione...</option>'+getObras().map(o=>`<option value="${o.id}">${o.nome}</option>`).join('');
+    document.getElementById('fase-group').style.display='none';
+  }
+  if(id==='modal-usuario'){document.getElementById('usr-empresa').innerHTML=DB.clientes.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');}
+  if(id==='modal-abastecimento'){
+    document.getElementById('ab-data').value=new Date().toISOString().slice(0,10);
+    const sv=document.getElementById('ab-veiculo');
+    sv.innerHTML='<option value="">Selecione...</option>'+getVeiculos().map(v=>`<option value="${v.id}">${v.placa} — ${v.modelo}</option>`).join('');
+    const so=document.getElementById('ab-obra');
+    so.innerHTML='<option value="">Selecione...</option>'+getObras().map(o=>`<option value="${o.id}">${o.nome}</option>`).join('');
+    document.getElementById('ab-calc-box').style.display='none';
+    document.getElementById('ab-file-preview').style.display='none';
+    document.getElementById('ab-upload-area').style.display='block';
+    abUploadedFile=null;
+  }
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showToast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+
+<!-- MODAL REGISTRAR COMPRA -->
+<div class="modal-ov" id="modal-registrar-compra">
+  <div class="modal" style="width:540px">
+    <div class="modal-head"><h3>Registrar Compra Realizada</h3><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-registrar-compra')">✕</button></div>
+    <div id="oc-info-box" style="background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:1rem;font-size:13px"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Data da Compra</label><input id="rc-data" type="date"/></div>
+      <div class="form-group"><label>Valor Pago (R$)</label><input id="rc-valor" type="number" placeholder="0.00" oninput="calcDiff()"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Forma de Pagamento</label>
+        <select id="rc-pagto">
+          <option>Boleto</option><option>PIX</option><option>Cartão</option>
+          <option>Transferência</option><option>Dinheiro</option><option>Cheque</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Nº Nota / Cupom / Recibo</label><input id="rc-doc" placeholder="Ex: NF-001234"/></div>
+    </div>
+    <div class="form-group"><label>Upload do Documento (PDF, JPG, PNG)</label>
+      <div class="upload-area" id="upload-area" onclick="document.getElementById('rc-file').click()">
+        <div style="font-size:24px;margin-bottom:8px">📎</div>
+        <div style="font-size:13px;color:var(--muted)">Clique para anexar nota fiscal, cupom ou recibo</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">PDF, JPG ou PNG — máx 5MB</div>
+      </div>
+      <input type="file" id="rc-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileUpload(this)"/>
+      <div id="file-preview" style="display:none" class="file-preview">
+        <div class="file-icon" style="background:rgba(240,136,62,.15)">📄</div>
+        <div style="flex:1">
+          <div id="file-name" style="font-size:13px;font-weight:500"></div>
+          <div id="file-size" style="font-size:11px;color:var(--muted)"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="removeFile()">✕</button>
+      </div>
+    </div>
+    <div id="diff-box" style="display:none;border-radius:8px;padding:12px;margin-bottom:1rem;font-size:13px"></div>
+    <div class="form-group"><label>Observação</label><textarea id="rc-obs" rows="2" placeholder="Observações sobre a compra..."></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn btn-ghost" onclick="closeModal('modal-registrar-compra')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarRegistroCompra()">Registrar Compra</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GERENCIAR FASES -->
+<div class="modal-ov" id="modal-fases">
+  <div class="modal" style="width:580px">
+    <div class="modal-head">
+      <h3 id="fases-modal-title">Fases / Centros de Custo</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-fases')">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:1rem">Cada fase tem seu próprio orçamento. O total da obra é a soma de todas as fases.</div>
+    <div id="fases-list" style="margin-bottom:1rem"></div>
+    <div style="background:var(--bg3);border-radius:10px;padding:1rem;margin-bottom:1rem">
+      <div style="font-size:12px;font-weight:600;margin-bottom:.75rem;color:var(--accent)">+ Nova Fase</div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0"><label>Nome da Fase</label><input id="nova-fase-nome" placeholder="Ex: Fase 1 — Aterro"/></div>
+        <div class="form-group" style="margin-bottom:0"><label>Orçamento (R$)</label><input id="nova-fase-orc" type="number" placeholder="0,00"/></div>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-top:.75rem;width:100%" onclick="adicionarFase()">Adicionar Fase</button>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-fases')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VEICULO -->
+<div class="modal-ov" id="modal-veiculo">
+  <div class="modal" style="width:480px">
+    <div class="modal-head"><h3>Cadastrar Veículo</h3><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-veiculo')">✕</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Placa</label><input id="v-placa" placeholder="ABC-1234" style="text-transform:uppercase"/></div>
+      <div class="form-group"><label>Tipo</label>
+        <select id="v-tipo"><option>Caminhão</option><option>Pickup</option><option>Van</option><option>Carro</option><option>Moto</option><option>Máquina</option></select>
+      </div>
+    </div>
+    <div class="form-group"><label>Modelo</label><input id="v-modelo" placeholder="Ex: Ford Cargo 1723"/></div>
+    <div class="form-group"><label>KM Atual</label><input id="v-km" type="number" placeholder="0"/></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn btn-ghost" onclick="closeModal('modal-veiculo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarVeiculo()">Cadastrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ABASTECIMENTO -->
+<div class="modal-ov" id="modal-abastecimento">
+  <div class="modal" style="width:540px">
+    <div class="modal-head"><h3>Registrar Abastecimento</h3><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-abastecimento')">✕</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Data</label><input id="ab-data" type="date"/></div>
+      <div class="form-group"><label>Veículo</label><select id="ab-veiculo" onchange="atualizarKmVeiculo()"><option value="">Selecione...</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Condutor</label><input id="ab-condutor" placeholder="Nome do motorista"/></div>
+      <div class="form-group"><label>Obra vinculada</label><select id="ab-obra"><option value="">Selecione...</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>KM Anterior</label><input id="ab-km-ant" type="number" placeholder="0" readonly style="opacity:.6"/></div>
+      <div class="form-group"><label>KM Atual</label><input id="ab-km-atual" type="number" placeholder="0" oninput="calcAbast()"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Litros</label><input id="ab-litros" type="number" placeholder="0.00" step="0.01" oninput="calcAbast()"/></div>
+      <div class="form-group"><label>Valor por Litro (R$)</label><input id="ab-vl" type="number" placeholder="0.00" step="0.01" oninput="calcAbast()"/></div>
+    </div>
+    <div class="form-group"><label>Posto</label><input id="ab-posto" placeholder="Nome do posto"/></div>
+    <div id="ab-calc-box" style="display:none;background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:.75rem">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:13px">
+        <div><span style="color:var(--muted)">Total: </span><strong id="ab-total" style="color:var(--green);font-size:16px"></strong></div>
+        <div><span style="color:var(--muted)">KM rodado: </span><strong id="ab-km-rod"></strong></div>
+        <div><span style="color:var(--muted)">KM/Litro: </span><strong id="ab-kml" style="color:var(--accent2)"></strong></div>
+      </div>
+    </div>
+    <div class="form-group"><label>Upload Comprovante (PDF, JPG, PNG)</label>
+      <div class="upload-area" id="ab-upload-area" onclick="document.getElementById('ab-file').click()">
+        <div style="font-size:20px;margin-bottom:6px">📎</div>
+        <div style="font-size:12px;color:var(--muted)">Clique para anexar cupom ou comprovante</div>
+      </div>
+      <input type="file" id="ab-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleAbFile(this)"/>
+      <div id="ab-file-preview" style="display:none" class="file-preview">
+        <div class="file-icon" style="background:rgba(88,166,255,.15)">📄</div>
+        <div style="flex:1"><div id="ab-file-name" style="font-size:13px;font-weight:500"></div><div id="ab-file-size" style="font-size:11px;color:var(--muted)"></div></div>
+        <button class="btn btn-ghost btn-sm" onclick="removeAbFile()">✕</button>
+      </div>
+    </div>
+    <div class="form-group"><label>Observação</label><textarea id="ab-obs" rows="2" placeholder="Observações..."></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn btn-ghost" onclick="closeModal('modal-abastecimento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarAbastecimento()">Registrar</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
